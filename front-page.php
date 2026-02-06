@@ -45,47 +45,42 @@ get_header();
         <div class="top__inner">
             <h2 class="top__title">FORTHCOMING EXHIBITIONS</h2>
             <ul class="top__exhibitions">
-            <li class="exhibition js-fade-up">
-                <a href="" class="exhibition__img">
-                <figure>
-                    <img src="<?php echo esc_url(get_template_directory_uri() . '/assets/img/top/img_exhibition01.png'); ?>" alt="" loading="lazy">
-                </figure>
-                </a>
-                <div class="exhibition__info">
-                <h3 class="exhibition__title">前田信明 × 谷﨑一心</h3>
-                <p class="exhibition__lead">呼吸する絵画</p>
-                <p class="exhibition__note">Breathing Paintings Cross / Vortex―交差と渦</p>
-                <p class="exhibition__date"><span>2025.06.21<span class="day">（日）</span></span><span class="en-dash">-</span><span>07.27<span class="day">（月）</span></span></p>
-                <a href="" class="exhibition__link u-link-more">Learn more</a>
-                </div>
-            </li>
-            <li class="exhibition js-fade-up">
-                <a href="" class="exhibition__img">
-                <figure>
-                    <img src="<?php echo esc_url(get_template_directory_uri() . '/assets/img/top/img_exhibition02.png'); ?>" alt="" loading="lazy">
-                </figure>
-                </a>
-                <div class="exhibition__info">
-                <h3 class="exhibition__title">AIKA NAGANO</h3>
-                <p class="exhibition__lead">FALLING INTO THE IN-BETWEEN</p>
-                <p class="exhibition__date"><span>2025.06.21<span class="day">（日）</span></span><span class="en-dash">-</span><span>07.27<span class="day">（月）</span></span></p>
-                <a href="" class="exhibition__link u-link-more">Learn more</a>
-                </div>
-            </li>
-            <li class="exhibition js-fade-up">
-                <a href="" class="exhibition__img">
-                <figure>
-                    <img src="<?php echo esc_url(get_template_directory_uri() . '/assets/img/top/img_exhibition03.png'); ?>" alt="" loading="lazy">
-                </figure>
-                </a>
-                <div class="exhibition__info">
-                <h3 class="exhibition__title">グループ展 Yukino Yamanaka Aiku Kurotaki Nao Tatsumi Ryunosuke Okazaki Thorben Eggers cocoro nakaura Sablo Mikawa</h3>
-                <p class="exhibition__lead">CONCERTO II</p>
-                <p class="exhibition__note">AKIINOUE / CON_ / HIRO OKAMOTO / SOM GALLERYAKIINOUE / CON_ / HIRO OKAMOTO / SOM GALLERY</p>
-                <p class="exhibition__date"><span>2025.06.21<span class="day">（日）</span></span><span class="en-dash">-</span><span>07.27<span class="day">（月）</span></span></p>
-                <a href="" class="exhibition__link u-link-more">Learn more</a>
-                </div>
-            </li>
+                <li class="exhibition js-fade-up">
+                    <a href="" class="exhibition__img">
+                    <figure>
+                        <img src="<?php echo esc_url(get_template_directory_uri() . '/assets/img/top/img_exhibition01.png'); ?>" alt="" loading="lazy">
+                    </figure>
+                    </a>
+                    <div class="exhibition__info">
+                    <h3 class="exhibition__title">前田信明 × 谷﨑一心</h3>
+                    <p class="exhibition__lead">呼吸する絵画</p>
+                    <p class="exhibition__note">Breathing Paintings Cross / Vortex―交差と渦</p>
+                    <p class="exhibition__date"><span>2025.06.21<span class="day">（日）</span></span><span class="en-dash">-</span><span>07.27<span class="day">（月）</span></span></p>
+                    <a href="" class="exhibition__link u-link-more">Learn more</a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </section>
+    <!-- artfair -->
+    <section class="top__section top__section--artfair">
+        <div class="top__inner">
+            <h2 class="top__title">ARTFAIR</h2>
+            <ul class="top__exhibitions">
+                <li class="exhibition js-fade-up">
+                    <a href="" class="exhibition__img">
+                    <figure>
+                        <img src="<?php echo esc_url(get_template_directory_uri() . '/assets/img/top/img_exhibition01.png'); ?>" alt="" loading="lazy">
+                    </figure>
+                    </a>
+                    <div class="exhibition__info">
+                    <h3 class="exhibition__title">前田信明 × 谷﨑一心</h3>
+                    <p class="exhibition__lead">呼吸する絵画</p>
+                    <p class="exhibition__note">Breathing Paintings Cross / Vortex―交差と渦</p>
+                    <p class="exhibition__date"><span>2025.06.21<span class="day">（日）</span></span><span class="en-dash">-</span><span>07.27<span class="day">（月）</span></span></p>
+                    <a href="" class="exhibition__link u-link-more">Learn more</a>
+                    </div>
+                </li>
             </ul>
         </div>
     </section>
