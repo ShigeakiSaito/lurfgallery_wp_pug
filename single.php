@@ -3,38 +3,47 @@ if (! defined('ABSPATH')) exit;
 get_header();
 ?>
 
-<?php if ( have_posts() ) : ?>
-  <?php while ( have_posts() ) : the_post(); ?>
-    <main class="single">
-      <h1><?php the_title(); ?></h1>
+<main class="single"> 
+    <?php if (have_posts()) : ?>
+        <?php while (have_posts()) : the_post(); ?>
+            
+            <h1><?php the_title(); ?></h1>
 
-      <?php 
-      $pc_id = get_field('mv_pc');
-      $sp_id = get_field('mv_sp');
+            <?php
+            $mv_type = get_field('mv_type');
+            $pc_id   = get_field('mv_img_pc');
+            $sp_id   = get_field('mv_img_sp');
+            $v_pc    = get_field('mv_video_pc');
+            $v_sp    = get_field('mv_video_sp');
 
-      if ($pc_id || $sp_id) : 
-          
-          $pc_src = $pc_id ? wp_get_attachment_image_src($pc_id, 'full')[0] : '';
-          $sp_src = $sp_id ? wp_get_attachment_image_src($sp_id, 'full')[0] : $pc_src;
-          
-          if (!$pc_src) { $pc_src = $sp_src; }
-      ?>
-        <div class="single__mv">
-            <picture>
-                <source media="(min-width: 768px)" srcset="<?php echo esc_url($pc_src); ?>">
-                <img src="<?php echo esc_url($sp_src); ?>" alt="<?php the_title(); ?>" style="width:100%; height:auto;">
-            </picture>
-        </div>
-      <?php endif; ?>
+            $pc_src = $pc_id ? wp_get_attachment_image_src($pc_id, 'full')[0] : '';
+            $sp_src = $sp_id ? wp_get_attachment_image_src($sp_id, 'full')[0] : $pc_src;
+            if (!$pc_src) { $pc_src = $sp_src; }
+            ?>
 
-      <div class="single__inner">
-        <section class="single__editable">
-          <?php the_content(); ?>
-        </section>
-      </div>
-    </main>
-  <?php endwhile; ?>
-<?php endif; ?>
+            <div class="single__mv">
+                <?php if ($mv_type === 'video' && ($v_pc || $v_sp)) : ?>
+                    <video autoplay muted loop playsinline poster="<?php echo esc_url($sp_src); ?>">
+                        <?php if ($v_pc): ?><source src="<?php echo esc_url($v_pc); ?>" media="(min-width: 768px)"><?php endif; ?>
+                        <?php if ($v_sp): ?><source src="<?php echo esc_url($v_sp); ?>"><?php endif; ?>
+                    </video>
+                <?php else : ?>
+                    <?php if ($pc_src || $sp_src) : ?>
+                        <picture>
+                            <source media="(min-width: 768px)" srcset="<?php echo esc_url($pc_src); ?>">
+                            <img src="<?php echo esc_url($sp_src); ?>" alt="<?php the_title(); ?>">
+                        </picture>
+                    <?php endif; ?>
+                <?php endif; ?>
+            </div>
 
-<?php
+            <div class="single__inner">
+                <section class="single__editable">
+                    <?php the_content(); ?>
+                </section>
+            </div>
+
+        <?php endwhile; ?>
+    <?php endif; ?>
+</main> <?php
 get_footer();

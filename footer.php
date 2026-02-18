@@ -7,10 +7,10 @@
         </div>
         <div class="footer__links">
             <ul class="list">
-                <li><a href="">ABOUT</a></li>
-                <li><a href="">CONTACT</a></li>
-                <li><a href="">SHOP</a></li>
-                <li><a href="">INFORMATION</a></li>
+                <!-- <li><a href="">ABOUT</a></li> -->
+                <li><a href="https://shop.lurfgallery.com/pages/contact">CONTACT</a></li>
+                <li><a href="https://shop.lurfgallery.com">SHOP</a></li>
+                <!-- <li><a href="">INFORMATION</a></li> -->
             </ul>
             <ul class="sns">
                 <li>
@@ -30,7 +30,7 @@
             </ul> 
         </div>
         <ul class="footer__copyright">
-            <li><a href="">Privacy Policy</a></li>
+            <li><a href="<?php echo esc_url(home_url('/privacy-policy')); ?>">Privacy Policy</a></li>
             <li>© 2025 LURF GALLERY</li>
         </ul>
     </div>
