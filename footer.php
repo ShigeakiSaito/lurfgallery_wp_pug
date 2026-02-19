@@ -1,10 +1,10 @@
 <footer class="footer">
     <div class="footer__inner">
-        <div class="footer__newsletter">
+        <!-- <div class="footer__newsletter">
             <p class="title">Newsletter</p>
             <p class="details">Subscribe to receive emails on forthcoming exhibitions,<br>artists, events, and more.</p>
             <a href="" class="link">Subscribe</a>
-        </div>
+        </div> -->
         <div class="footer__links">
             <ul class="list">
                 <!-- <li><a href="">ABOUT</a></li> -->
