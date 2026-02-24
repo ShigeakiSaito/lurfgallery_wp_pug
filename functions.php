@@ -79,13 +79,13 @@ function create_post_type()
 			'menu_position' => 5,
 		)
 	);
-	// artist
+	// artists
 	register_post_type(
-		'artist',
+		'artists',
 		array(
 			'labels' => array(
-				'name' => __('artist'),
-				'singular_name' => __('artist')
+				'name' => __('artists'),
+				'singular_name' => __('artists')
 			),
 			'public' => true,
 			'show_in_rest' => true,
