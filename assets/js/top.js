@@ -57,16 +57,29 @@ window.addEventListener('load', () => {
   }
 
   // news swiper 
-  const topNewsSwiper = new Swiper('#topNewsSwiper', {
-    loop: true,
-    speed: 800,
-    pagination: {
-      el: '.news-pagination',
-      type: 'fraction',
-    },
-    navigation: {
-      nextEl: '.news-button-next',
-      prevEl: '.news-button-prev',
-    },
-  });
+  const swiperEl = document.querySelector('#topNewsSwiper');
+  const controller = document.querySelector('.top__newslist .swiper-controller-wrapper');
+  const slideCount = swiperEl.querySelectorAll('#topNewsSwiper .swiper-slide').length;
+
+  if (slideCount === 0) {
+    swiperEl.innerHTML = '<p class="top__notice">There are currently no news updates.</p>';
+    
+    if (controller) {
+      controller.classList.add('is-empty');
+    }
+
+  } else {
+    const topNewsSwiper = new Swiper('#topNewsSwiper', {
+      loop: slideCount > 1,
+      speed: 800,
+      pagination: slideCount > 1 ? {
+        el: '.news-pagination',
+        type: 'fraction',
+      } : false,
+      navigation: slideCount > 1 ? {
+        nextEl: '.news-button-next',
+        prevEl: '.news-button-prev',
+      } : false,
+    });
+  }
 });
