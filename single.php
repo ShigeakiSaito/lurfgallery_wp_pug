@@ -22,19 +22,30 @@ get_header();
             ?>
 
             <div class="single__mv">
-                <?php if ($mv_type === 'video' && ($v_pc || $v_sp)) : ?>
-                    <video autoplay muted loop playsinline poster="<?php echo esc_url($sp_src); ?>">
-                        <?php if ($v_pc): ?><source src="<?php echo esc_url($v_pc); ?>" media="(min-width: 768px)"><?php endif; ?>
-                        <?php if ($v_sp): ?><source src="<?php echo esc_url($v_sp); ?>"><?php endif; ?>
-                    </video>
-                <?php else : ?>
-                    <?php if ($pc_src || $sp_src) : ?>
-                        <picture>
-                            <source media="(min-width: 768px)" srcset="<?php echo esc_url($pc_src); ?>">
-                            <img src="<?php echo esc_url($sp_src); ?>" alt="<?php the_title(); ?>">
-                        </picture>
-                    <?php endif; ?>
+            <?php if ($mv_type === 'video' && ($v_pc || $v_sp)) : ?>
+
+                <?php if ($v_pc) : ?>
+                <video autoplay muted loop playsinline webkit-playsinline preload="metadata" class="only-pc">
+                    <source src="<?php echo esc_url($v_pc); ?>">
+                </video>
                 <?php endif; ?>
+
+                <?php if ($v_sp) : ?>
+                <video autoplay muted loop playsinline webkit-playsinline preload="metadata" class="only-sp">
+                    <source src="<?php echo esc_url($v_sp); ?>">
+                </video>
+                <?php endif; ?>
+
+                <?php else : ?>
+
+                <?php if ($pc_src || $sp_src) : ?>
+                <picture>
+                    <source media="(min-width: 768px)" srcset="<?php echo esc_url($pc_src); ?>">
+                    <img src="<?php echo esc_url($sp_src); ?>" alt="<?php the_title(); ?>">
+                </picture>
+                <?php endif; ?>
+
+            <?php endif; ?>
             </div>
 
             <div class="single__inner">
