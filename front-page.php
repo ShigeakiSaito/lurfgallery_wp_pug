@@ -9,8 +9,10 @@ get_header();
     <div class="top__mv">
         <?php $upload_dir = wp_get_upload_dir(); ?>
         <a href="<?php echo esc_url( home_url( '/exhibitions/group-exhibition-imagination/' ) ); ?>">
-            <video autoplay muted loop playsinline>
-                <source src="<?php echo esc_url($upload_dir['baseurl'] . '/2026/02/img_mv_pc.mp4'); ?>" media="(min-width: 768px)">
+            <video autoplay muted loop playsinline preload="metadata" class="only-pc">
+                <source src="<?php echo esc_url($upload_dir['baseurl'] . '/2026/02/img_mv_pc.mp4'); ?>">
+            </video>
+            <video autoplay muted loop playsinline preload="metadata" class="only-sp">
                 <source src="<?php echo esc_url($upload_dir['baseurl'] . '/2026/02/img_mv_sp.mp4'); ?>">
             </video>
         </a>
