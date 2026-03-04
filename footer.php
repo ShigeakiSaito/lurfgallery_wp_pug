@@ -10,7 +10,7 @@
                 <!-- <li><a href="">ABOUT</a></li> -->
                 <li><a href="https://shop.lurfgallery.com/pages/contact" target="_blank">CONTACT</a></li>
                 <li><a href="https://shop.lurfgallery.com" target="_blank">SHOP</a></li>
-                <!-- <li><a href="">INFORMATION</a></li> -->
+                <li><a href="<?php echo esc_url( home_url( '/information' ) ); ?>">INFORMATION</a></li>
             </ul>
             <ul class="sns">
                 <li>
