@@ -58,9 +58,48 @@ function create_post_type() {
       ),
       'public' => true,
 			'show_in_rest' => true,
-      // 'has_archive' => true,
-      'menu_position' => 4,
+      'has_archive' => true,
+      'menu_position' => 6,
     )
+	);
+	// artworks
+	register_post_type( 'artworks',
+		array(
+			'labels' => array(
+				'name' => __( 'artworks' ),
+				'singular_name' => __( 'artworks' )
+			),
+			'public' => true,
+			'show_in_rest' => true,
+			// 'has_archive' => true,
+			'menu_position' => 6,
+		)
+	);
+	// editions
+	register_post_type( 'editions',
+		array(
+			'labels' => array(
+				'name' => __( 'editions' ),
+				'singular_name' => __( 'editions' )
+			),
+			'public' => true,
+			'show_in_rest' => true,
+			// 'has_archive' => true,
+			'menu_position' => 6,
+		)
+	);
+	// books
+	register_post_type( 'books',
+		array(
+			'labels' => array(
+				'name' => __( 'books' ),
+				'singular_name' => __( 'books' )
+			),
+			'public' => true,
+			'show_in_rest' => true,
+			// 'has_archive' => true,
+			'menu_position' => 6,
+		)
 	);
 	// artfairs
 	register_post_type( 'artfairs',
@@ -71,9 +110,48 @@ function create_post_type() {
 			),
 			'public' => true,
 			'show_in_rest' => true,
-			// 'has_archive' => true,
-			'menu_position' => 5,
+			'has_archive' => true,
+			'menu_position' => 6,
+		)
+	);
+	// artists
+	register_post_type( 'artists',
+		array(
+			'labels' => array(
+				'name' => __( 'artists' ),
+				'singular_name' => __( 'artists' )
+			),
+			'public' => true,
+			'show_in_rest' => true,
+			'has_archive' => true,
+			'menu_position' => 6,
 		)
 	);
 }
 add_action( 'init', 'create_post_type' );
+
+// メディアのメニュー位置変更
+function custom_menu_order( $menu_order ) {
+    global $menu;
+
+    foreach ( $menu as $key => $item ) {
+        if ( $item[2] === 'upload.php' ) {
+            $media_menu = $menu[ $key ];
+            unset( $menu[ $key ] );
+            $menu[15] = $media_menu;
+            break;
+        }
+				if ( $item[2] === 'edit.php?post_type=artfairs' ) {
+						$artfairs_menu = $menu[ $key ];
+						unset( $menu[ $key ] );
+						$menu[11] = $artfairs_menu;
+						break;
+				}
+    }
+
+    ksort( $menu );
+    return $menu_order;
+}
+add_filter( 'custom_menu_order', '__return_true' );
+add_filter( 'menu_order', 'custom_menu_order' );
+
