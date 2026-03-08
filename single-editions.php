@@ -40,21 +40,21 @@
 					<h2 class="edition-detail__artist"><?php echo esc_html($artist_name['value']); ?></h2>
 					<?php endif; ?>
 
-					<?php $artwork_title = get_field('artwork_title'); ?>
-					<?php if (!empty($artwork_title['is_display']) && !empty($artwork_title['value'])) : ?>
-					<h3 class="edition-detail__title"><?php echo esc_html($artwork_title['value']); ?></h3>
+					<?php $title = get_field('title'); ?>
+					<?php if (!empty($title['is_display']) && !empty($title['value'])) : ?>
+					<h3 class="edition-detail__title"><?php echo esc_html($title['value']); ?></h3>
 					<?php endif; ?>
 
 					<div class="edition-detail__spec">
 						<div class="edition-detail__spec-items">
 							<?php
 							$spec_fields = [
-								'artwork_year',
-								'artwork_edition',
-								'artwork_material',
-								'artwork_sign',
-								'artwork_frame',
-								'artwork_size',
+								'year',
+								'edition',
+								'material',
+								'sign',
+								'frame',
+								'size',
 							];
 							foreach ($spec_fields as $field_name) :
 								$field = get_field($field_name);
@@ -63,27 +63,27 @@
 							<p><?php echo esc_html($field['value']); ?></p>
 							<?php endif; endforeach; ?>
 						</div>
-						<?php $description = get_field('artwork_description'); ?>
+						<?php $description = get_field('description'); ?>
 						<?php if (!empty($description['is_display']) && !empty($description['value'])) : ?>
 						<p class="edition-detail__description">
 							<?php echo esc_html($description['value']); ?>
 						</p>
 						<?php endif; ?>
 					</div>
-					<?php $note = get_field('artwork_note'); ?>
+					<?php $note = get_field('note'); ?>
 					<?php if (!empty($note['is_display']) && !empty($note['value'])) : ?>
 					<div class="edition-detail__text">
 						<p><?php echo esc_html($note['value']); ?></p>
 					</div>
 					<?php endif; ?>
-					<?php $buttons = get_field('artwork_buttons'); ?>
-          <?php if (!empty($buttons['artwork_contact']) || !empty($buttons['artwork_purchase'])) : ?>
+					<?php $buttons = get_field('buttons'); ?>
+          <?php if (!empty($buttons['contact']) || !empty($buttons['purchase'])) : ?>
           <div class="edition-detail__buttons">
-            <?php if (!empty($buttons['artwork_contact'])) : ?>
+            <?php if (!empty($buttons['contact'])) : ?>
             <a href="/art_contact/" class="edition-detail__button">CONTACT</a>
             <?php endif; ?>
-            <?php if (!empty($buttons['artwork_purchase'])) : ?>
-            <a href="<?php echo esc_url(get_field('artwork_purchase_url')); ?>" class="edition-detail__button">PURCHASE</a>
+            <?php if (!empty($buttons['purchase'])) : ?>
+            <a href="<?php echo esc_url(get_field('purchase_url')); ?>" class="edition-detail__button">PURCHASE</a>
             <?php endif; ?>
           </div>
           <?php endif; ?>
