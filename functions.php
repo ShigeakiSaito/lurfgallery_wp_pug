@@ -86,6 +86,7 @@ function create_post_type() {
 			'show_in_rest' => true,
 			// 'has_archive' => true,
 			'menu_position' => 6,
+			'supports' => array('title', 'custom-fields'),
 		)
 	);
 	// books
