@@ -32,6 +32,13 @@
 						</figure>
 						<div class="news-card__body">
 							<h3 class="news-card__title"><?php the_title(); ?></h3>
+							<?php
+							$excerpt = get_the_excerpt();
+							if ($excerpt) {
+								$excerpt = wp_strip_all_tags($excerpt);
+								echo '<p class="news-card__excerpt">' . esc_html($excerpt) . '</p>';
+							}
+							?>
 							<div class="news-card__meta">
 								<time class="news-card__date" datetime="<?php echo get_the_date('Y-m-d'); ?>"><?php echo get_the_date('Y.m.d'); ?></time>
 								<?php $categories = get_the_category(); ?>
@@ -47,7 +54,7 @@
 				<?php endwhile; ?>
 				<?php wp_reset_postdata(); ?>
 			</ul>
-			
+
 			<!-- View more -->
 			<?php if ($news_query->found_posts > 12) : ?>
 			<div class="news-index__more" id="js-news-more">
