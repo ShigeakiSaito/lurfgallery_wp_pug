@@ -136,6 +136,22 @@ function create_post_type() {
 }
 add_action( 'init', 'create_post_type' );
 
+// 投稿(post)のURLを /news/{slug} に変更
+function register_news_rewrite_rules() {
+    add_rewrite_rule( 'news/?$', 'index.php?post_type=post', 'top' );
+    add_rewrite_rule( 'news/page/([0-9]+)/?$', 'index.php?post_type=post&paged=$matches[1]', 'top' );
+    add_rewrite_rule( 'news/([^/]+)/?$', 'index.php?name=$matches[1]', 'top' );
+}
+add_action( 'init', 'register_news_rewrite_rules' );
+
+function change_post_permalink( $permalink, $post ) {
+    if ( $post->post_type === 'post' ) {
+        return home_url( '/news/' . $post->post_name . '/' );
+    }
+    return $permalink;
+}
+add_filter( 'post_link', 'change_post_permalink', 10, 2 );
+
 // メニュー位置変更
 function custom_admin_menu_order() {
     global $menu;
@@ -164,4 +180,21 @@ function custom_admin_menu_order() {
     ksort( $menu );
 }
 add_action( 'admin_menu', 'custom_admin_menu_order', 999 );
+
+// 「投稿」メニューを「news」に変更
+function rename_post_menu_label() {
+    global $menu, $submenu;
+
+    foreach ( $menu as $key => $item ) {
+        if ( $item[2] === 'edit.php' ) {
+            $menu[ $key ][0] = 'news';
+            break;
+        }
+    }
+
+    if ( isset( $submenu['edit.php'] ) ) {
+        $submenu['edit.php'][5][0] = 'news';
+    }
+}
+add_action( 'admin_menu', 'rename_post_menu_label' );
 
