@@ -47,6 +47,8 @@ function theme_enqueue_assets() {
 }
 add_action('wp_enqueue_scripts', 'theme_enqueue_assets');
 
+add_theme_support('post-thumbnails');
+
 // 投稿機能の追加
 function create_post_type() {
 	// exhibitions
