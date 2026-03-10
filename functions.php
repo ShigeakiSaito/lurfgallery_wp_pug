@@ -136,28 +136,32 @@ function create_post_type() {
 }
 add_action( 'init', 'create_post_type' );
 
-// メディアのメニュー位置変更
-function custom_menu_order( $menu_order ) {
+// メニュー位置変更
+function custom_admin_menu_order() {
     global $menu;
 
+    $moves = [
+        'upload.php' => 15,
+        'edit.php?post_type=artfairs' => 11,
+    ];
+    $collected = [];
+
     foreach ( $menu as $key => $item ) {
-        if ( $item[2] === 'upload.php' ) {
-            $media_menu = $menu[ $key ];
+        if ( isset( $moves[ $item[2] ] ) ) {
+            $collected[ $item[2] ] = $menu[ $key ];
             unset( $menu[ $key ] );
-            $menu[15] = $media_menu;
-            break;
         }
-				if ( $item[2] === 'edit.php?post_type=artfairs' ) {
-						$artfairs_menu = $menu[ $key ];
-						unset( $menu[ $key ] );
-						$menu[11] = $artfairs_menu;
-						break;
-				}
+    }
+
+    foreach ( $collected as $slug => $item ) {
+        $pos = $moves[ $slug ];
+        while ( isset( $menu[ $pos ] ) ) {
+            $pos++;
+        }
+        $menu[ $pos ] = $item;
     }
 
     ksort( $menu );
-    return $menu_order;
 }
-add_filter( 'custom_menu_order', '__return_true' );
-add_filter( 'menu_order', 'custom_menu_order' );
+add_action( 'admin_menu', 'custom_admin_menu_order', 999 );
 
