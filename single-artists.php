@@ -8,6 +8,10 @@ $biography = get_field('biography');
 
 $noimage = esc_url(get_template_directory_uri() . '/assets/img/common/noimage.png');
 
+$exhibitions = get_field('exhibitions');
+$artfairs = get_field('artfairs');
+$news = get_field('news');
+
 // ===== SELECTED ARTWORKS: 初期表示行数（変更はここだけ） =====
 $artworks_initial_rows = 5; // PC版で表示する行数
 ?>
@@ -51,9 +55,9 @@ $artworks_initial_rows = 5; // PC版で表示する行数
 		$has_artworks = !empty($selected_artworks['set']);
 		$has_biography = !empty($biography['text']) || !empty($biography['set']);
 		// Exhibitions / Fairs / News / Product はカスタムフィールド未実装のため一旦非表示
-		$has_exhibitions = false;
-		$has_fairs = false;
-		$has_news = false;
+		$has_exhibitions = !empty($exhibitions);
+		$has_fairs = !empty($artfairs);
+		$has_news = !empty($news);
 		$has_product = false;
 		?>
 		<nav class="artist-detail__nav" id="js-artist-nav">
@@ -237,7 +241,7 @@ $artworks_initial_rows = 5; // PC版で表示する行数
 			<?php $bio_text = $biography['text'] ?? ''; ?>
 			<?php if ($bio_text) : ?>
 			<div class="artist-detail__bio-text">
-				<?php echo nl2br(esc_html($bio_text)); ?>
+				<?php echo wp_kses_post($bio_text); ?>
 			</div>
 			<?php endif; ?>
 			<?php $bio_sets = $biography['set'] ?? []; ?>
@@ -294,6 +298,31 @@ $artworks_initial_rows = 5; // PC版で表示する行数
 			<div class="artist-detail__slider-body">
 				<div class="swiper js-artist-exh-swiper" id="artistExhSwiper">
 					<div class="swiper-wrapper">
+						<?php foreach ($exhibitions as $exh) :
+						  // $exh はACFの投稿オブジェクト
+							$exh_id = is_object($exh) ? $exh->ID : $exh;
+							$exh_title = get_the_title($exh_id);
+							$exh_images = get_field('main_visual', $exh_id); // 画像配列
+							$exh_image_url = '';
+							$exh_image_alt = '';
+							echo "<!-- " . print_r($exh_images, true) . " -->";
+							if ($exh_images && !empty($exh_images['image'])) {
+								$exh_image_url = esc_url($exh_images['image']['url']);
+								$exh_image_alt = esc_attr($exh_images['image']['alt'] ?? '');
+							}
+						?>
+						<div class="swiper-slide">
+							<a href="<?php echo get_permalink($exh_id); ?>" class="artist-detail__exh-card">
+								<div class="artist-detail__exh-card-img">
+									<img src="<?php echo $exh_image_url; ?>" alt="<?php echo $exh_image_alt; ?>" loading="lazy">
+								</div>
+								<p class="artist-detail__exh-card-artist">アーティスト</p>
+								<p class="artist-detail__exh-card-title"><?php echo esc_html($exh_title); ?></p>
+								<p class="artist-detail__exh-card-subtitle">サブタイトル</p>
+								<p class="artist-detail__exh-card-period">会期</p>
+							</a>
+						</div>
+						<?php endforeach; ?>
 					</div>
 				</div>
 			</div>
@@ -344,6 +373,31 @@ $artworks_initial_rows = 5; // PC版で表示する行数
 			<div class="artist-detail__slider-body">
 				<div class="swiper js-artist-news-swiper" id="artistNewsSwiper">
 					<div class="swiper-wrapper">
+						<?php foreach ($news as $news_item) :
+							// $news_item はACFの投稿オブジェクト
+							$news_id = is_object($news_item) ? $news_item->ID : $news_item;
+							$news_title = get_the_title($news_id);
+							// サムネイル取得
+							$news_image = get_the_post_thumbnail_url($news_id, 'full') ? get_post_thumbnail_id($news_id) : null;
+							echo "<!-- news image ID: " . print_r($news_image, true) . " -->";
+							if ($news_image):
+								$news_image_url = $news_image ? esc_url(wp_get_attachment_image_url($news_image, 'medium_large')) : '';
+								$news_image_alt = $news_image ? esc_attr(get_post_meta($news_image, '_wp_attachment_image_alt', true)) : '';
+							else:
+								$news_image_url = $noimage;
+								$news_image_alt = '';
+							endif;
+						?>
+						<div class="swiper-slide">
+							<a href="<?php echo get_permalink($news_id); ?>" class="artist-detail__news-card">
+								<div class="artist-detail__news-card-img">
+									<img src="<?php echo $news_image_url; ?>" alt="<?php echo $news_image_alt; ?>" loading="lazy">
+								</div>
+								<p class="artist-detail__news-card-title"><?php echo esc_html($news_title); ?></p>
+								<p class="artist-detail__news-card-date"><?php echo get_the_date('Y.m.d', $news_id); ?></p>
+							</a>
+						</div>
+						<?php endforeach; ?>
 					</div>
 				</div>
 			</div>
