@@ -7,6 +7,9 @@ $selected_artworks = get_field('selected_artworks');
 $biography = get_field('biography');
 
 $noimage = esc_url(get_template_directory_uri() . '/assets/img/common/noimage.png');
+
+// ===== SELECTED ARTWORKS: 初期表示行数（変更はここだけ） =====
+$artworks_initial_rows = 5; // PC版で表示する行数
 ?>
 
 	<main class="single artist-detail">
@@ -149,14 +152,18 @@ $noimage = esc_url(get_template_directory_uri() . '/assets/img/common/noimage.pn
 			<div class="artist-detail__artworks-grid" id="js-artworks-grid">
 				<?php
 				$sets = $selected_artworks['set'];
-				$is_first_set = true;
 				foreach ($sets as $set) :
 					$columns = $set['columns'] ?? 'col3';
 					$works = $set['works'] ?? [];
 					if (empty($works)) continue;
+
+					// カラム数から初期表示件数を算出
 					$col_count = ($columns === 'col1') ? 1 : (($columns === 'col2') ? 2 : 3);
+					$initial_visible = $col_count * $artworks_initial_rows;
 				?>
-				<div class="artist-detail__artworks-row artist-detail__artworks-row--<?php echo esc_attr($columns); ?>">
+				<div class="artist-detail__artworks-row artist-detail__artworks-row--<?php echo esc_attr($columns); ?>"
+					data-col-count="<?php echo esc_attr($col_count); ?>"
+					data-initial-rows="<?php echo esc_attr($artworks_initial_rows); ?>">
 					<?php foreach ($works as $index => $artwork_id) :
 						$artwork_id = is_object($artwork_id) ? $artwork_id->ID : $artwork_id;
 						$artwork_images = get_field('images', $artwork_id);
@@ -181,9 +188,8 @@ $noimage = esc_url(get_template_directory_uri() . '/assets/img/common/noimage.pn
 						}
 						$spec_text = implode(', ', $spec_parts);
 
-						$hidden_class = (!$is_first_set && $index >= $col_count) ? ' is-hidden' : '';
-						if (!$is_first_set && $index < $col_count) $hidden_class = '';
-						if ($is_first_set) $hidden_class = '';
+						// 初期表示件数を超えたら is-hidden を付与
+						$hidden_class = ($index >= $initial_visible) ? ' is-hidden' : '';
 					?>
 					<a href="<?php echo esc_url(get_permalink($artwork_id)); ?>" class="artist-detail__artwork<?php echo $hidden_class; ?>">
 						<div class="artist-detail__artwork-img">
@@ -206,19 +212,14 @@ $noimage = esc_url(get_template_directory_uri() . '/assets/img/common/noimage.pn
 						</div>
 					</a>
 					<?php endforeach; ?>
-					<!-- View more -->
-					<div class="artist-detail__artworks-more" id="js-artist-artworks-more">
-						<button type="button" class="u-button-more">View more</button>
-					</div>
 				</div>
-				<?php
-				$is_first_set = false;
-				endforeach; ?>
-			</div>
-
-			<!-- View more -->
-			<div class="artist-detail__artworks-more" id="js-artist-artworks-more">
-				<button type="button" class="u-button-more">View more</button>
+				<?php // View more を row の外に配置し、data-target-row で紐づけ ?>
+				<?php if (count($works) > $initial_visible) : ?>
+				<div class="artist-detail__artworks-more js-artworks-more" data-target-row="<?php echo esc_attr($columns); ?>">
+					<button type="button" class="u-button-more">View more</button>
+				</div>
+				<?php endif; ?>
+				<?php endforeach; ?>
 			</div>
 
 			<!-- CTA -->
@@ -368,35 +369,35 @@ $noimage = esc_url(get_template_directory_uri() . '/assets/img/common/noimage.pn
 			});
 		}
 
-		// ----- SELECTED ARTWORKS View more -----
-		const artworksGrid = document.getElementById('js-artworks-grid');
-		const artworksMoreWrap = document.getElementById('js-artist-artworks-more');
+		// ----- SELECTED ARTWORKS View more（row ごとに独立、ボタンは row の外） -----
+		document.querySelectorAll('.js-artworks-more').forEach(moreWrap => {
+			// 直前の兄弟要素が対応する row
+			const row = moreWrap.previousElementSibling;
+			if (!row || !row.classList.contains('artist-detail__artworks-row')) return;
 
-		if (artworksGrid && artworksMoreWrap) {
-			const artworksBtn = artworksMoreWrap.querySelector('.u-button-more');
+			const moreBtn = moreWrap.querySelector('.u-button-more');
+			const colCount = parseInt(row.dataset.colCount, 10) || 3;
 
-			const getArtworksShowCount = (item) => {
-				const row = item.closest('.artist-detail__artworks-row');
-				if (row?.classList.contains('artist-detail__artworks-row--col1')) return 1;
-				if (row?.classList.contains('artist-detail__artworks-row--col2')) return 2;
-				return 3;
-			};
-
-			const updateArtworksMoreVisibility = () => {
-				const hiddenItems = artworksGrid.querySelectorAll('.artist-detail__artwork.is-hidden');
+			/**
+			 * hidden アイテムが 0 件になったらボタンを非表示にする
+			 */
+			const updateMoreVisibility = () => {
+				const hiddenItems = row.querySelectorAll('.artist-detail__artwork.is-hidden');
 				if (hiddenItems.length === 0) {
-					artworksMoreWrap.style.display = 'none';
+					moreWrap.style.display = 'none';
 				}
 			};
 
-			updateArtworksMoreVisibility();
+			// 初期チェック
+			updateMoreVisibility();
 
-			if (artworksBtn) {
-				artworksBtn.addEventListener('click', () => {
-					const hiddenItems = artworksGrid.querySelectorAll('.artist-detail__artwork.is-hidden');
+			if (moreBtn) {
+				moreBtn.addEventListener('click', () => {
+					const hiddenItems = row.querySelectorAll('.artist-detail__artwork.is-hidden');
 					if (hiddenItems.length === 0) return;
 
-					const showCount = Math.min(getArtworksShowCount(hiddenItems[0]), hiddenItems.length);
+					// 1行分（= カラム数）だけ表示する
+					const showCount = Math.min(colCount, hiddenItems.length);
 
 					for (let i = 0; i < showCount; i++) {
 						const item = hiddenItems[i];
@@ -408,10 +409,10 @@ $noimage = esc_url(get_template_directory_uri() . '/assets/img/common/noimage.pn
 						}, { once: true });
 					}
 
-					updateArtworksMoreVisibility();
+					updateMoreVisibility();
 				});
 			}
-		}
+		});
 
 		// ----- BIOGRAPHY View more（グループ単位） -----
 		document.querySelectorAll('.artist-detail__bio-group').forEach(group => {
