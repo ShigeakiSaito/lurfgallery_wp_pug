@@ -200,3 +200,45 @@ function rename_post_menu_label() {
 }
 add_action( 'admin_menu', 'rename_post_menu_label' );
 
+// 検索対象の投稿タイプを拡張
+function custom_search_post_types( $query ) {
+	if ( $query->is_search() && $query->is_main_query() && ! is_admin() ) {
+		$query->set( 'post_type', [ 'post', 'page', 'exhibitions', 'artfairs', 'artists' ] );
+		$query->set( 'posts_per_page', 12 );
+	}
+}
+add_action( 'pre_get_posts', 'custom_search_post_types' );
+
+// カスタムフィールド(description)も検索対象に含める
+function custom_search_join( $join, $query ) {
+	global $wpdb;
+	if ( $query->is_search() && $query->is_main_query() && ! is_admin() ) {
+		$join .= " LEFT JOIN {$wpdb->postmeta} AS search_meta ON ({$wpdb->posts}.ID = search_meta.post_id AND search_meta.meta_key = 'description')";
+	}
+	return $join;
+}
+add_filter( 'posts_join', 'custom_search_join', 10, 2 );
+
+function custom_search_where( $where, $query ) {
+	global $wpdb;
+	if ( $query->is_search() && $query->is_main_query() && ! is_admin() ) {
+		$search_term = $query->get( 's' );
+		$like = '%' . $wpdb->esc_like( $search_term ) . '%';
+		$where = preg_replace(
+			"/\({$wpdb->posts}\.post_title LIKE (.*?)\)/",
+			"({$wpdb->posts}.post_title LIKE $1) OR (search_meta.meta_value LIKE '" . esc_sql( $like ) . "')",
+			$where
+		);
+	}
+	return $where;
+}
+add_filter( 'posts_where', 'custom_search_where', 10, 2 );
+
+function custom_search_distinct( $distinct, $query ) {
+	if ( $query->is_search() && $query->is_main_query() && ! is_admin() ) {
+		return 'DISTINCT';
+	}
+	return $distinct;
+}
+add_filter( 'posts_distinct', 'custom_search_distinct', 10, 2 );
+
