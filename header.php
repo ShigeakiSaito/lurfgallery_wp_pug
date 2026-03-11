@@ -49,8 +49,8 @@
                 <li><a href="">SHOP</a></li>
                 <li><a href="">INFORMATION</a></li>
             </ul>
-            <form action="" class="header__search">
-                <label><input type="text" placeholder="SEARCH"></label>
+            <form action="<?php echo esc_url(home_url('/')); ?>" method="get" class="header__search">
+                <label><input type="text" name="s" value="<?php echo esc_attr(get_search_query()); ?>" placeholder="SEARCH"></label>
             </form>
             <div class="header__language">
                 <a href="<?php echo esc_url(home_url('/')); ?>" class="jp">JP</a>
