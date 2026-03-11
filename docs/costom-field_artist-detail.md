@@ -51,3 +51,11 @@ overview->name1
 *** 年代: biography->set[]->set[]->year
 *** 内容: biography->set[]->set[]->text
 
+* EXHIBITIONS: exhibitions
+** 投稿リスト：exhibitions[]
+
+* ARTFAIR: artfairs
+** 投稿リスト：artfairs[]
+
+* NEWS: news
+** 投稿リスト: news[]
