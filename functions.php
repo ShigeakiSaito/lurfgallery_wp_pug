@@ -204,7 +204,7 @@ add_action( 'admin_menu', 'rename_post_menu_label' );
 function custom_search_post_types( $query ) {
 	if ( $query->is_search() && $query->is_main_query() && ! is_admin() ) {
 		$query->set( 'post_type', [ 'post', 'page', 'exhibitions', 'artfairs', 'artists' ] );
-		$query->set( 'posts_per_page', 12 );
+		$query->set( 'posts_per_page', -1 );
 	}
 }
 add_action( 'pre_get_posts', 'custom_search_post_types' );
