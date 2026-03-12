@@ -47,6 +47,8 @@ function theme_enqueue_assets() {
 }
 add_action('wp_enqueue_scripts', 'theme_enqueue_assets');
 
+add_theme_support('post-thumbnails');
+
 // 投稿機能の追加
 function create_post_type() {
 	// exhibitions
@@ -136,28 +138,107 @@ function create_post_type() {
 }
 add_action( 'init', 'create_post_type' );
 
-// メディアのメニュー位置変更
-function custom_menu_order( $menu_order ) {
+// 投稿(post)のURLを /news/{slug} に変更
+function register_news_rewrite_rules() {
+    add_rewrite_rule( 'news/?$', 'index.php?post_type=post', 'top' );
+    add_rewrite_rule( 'news/page/([0-9]+)/?$', 'index.php?post_type=post&paged=$matches[1]', 'top' );
+    add_rewrite_rule( 'news/([^/]+)/?$', 'index.php?name=$matches[1]', 'top' );
+}
+add_action( 'init', 'register_news_rewrite_rules' );
+
+function change_post_permalink( $permalink, $post ) {
+    if ( $post->post_type === 'post' ) {
+        return home_url( '/news/' . $post->post_name . '/' );
+    }
+    return $permalink;
+}
+add_filter( 'post_link', 'change_post_permalink', 10, 2 );
+
+// メニュー位置変更
+function custom_admin_menu_order() {
     global $menu;
 
+    $moves = [
+        'upload.php' => 15,
+        'edit.php?post_type=artfairs' => 11,
+    ];
+    $collected = [];
+
     foreach ( $menu as $key => $item ) {
-        if ( $item[2] === 'upload.php' ) {
-            $media_menu = $menu[ $key ];
+        if ( isset( $moves[ $item[2] ] ) ) {
+            $collected[ $item[2] ] = $menu[ $key ];
             unset( $menu[ $key ] );
-            $menu[15] = $media_menu;
-            break;
         }
-				if ( $item[2] === 'edit.php?post_type=artfairs' ) {
-						$artfairs_menu = $menu[ $key ];
-						unset( $menu[ $key ] );
-						$menu[11] = $artfairs_menu;
-						break;
-				}
+    }
+
+    foreach ( $collected as $slug => $item ) {
+        $pos = $moves[ $slug ];
+        while ( isset( $menu[ $pos ] ) ) {
+            $pos++;
+        }
+        $menu[ $pos ] = $item;
     }
 
     ksort( $menu );
-    return $menu_order;
 }
-add_filter( 'custom_menu_order', '__return_true' );
-add_filter( 'menu_order', 'custom_menu_order' );
+add_action( 'admin_menu', 'custom_admin_menu_order', 999 );
+
+// 「投稿」メニューを「news」に変更
+function rename_post_menu_label() {
+    global $menu, $submenu;
+
+    foreach ( $menu as $key => $item ) {
+        if ( $item[2] === 'edit.php' ) {
+            $menu[ $key ][0] = 'news';
+            break;
+        }
+    }
+
+    if ( isset( $submenu['edit.php'] ) ) {
+        $submenu['edit.php'][5][0] = 'news';
+    }
+}
+add_action( 'admin_menu', 'rename_post_menu_label' );
+
+// 検索対象の投稿タイプを拡張
+function custom_search_post_types( $query ) {
+	if ( $query->is_search() && $query->is_main_query() && ! is_admin() ) {
+		$query->set( 'post_type', [ 'post', 'page', 'exhibitions', 'artfairs', 'artists' ] );
+		$query->set( 'posts_per_page', -1 );
+	}
+}
+add_action( 'pre_get_posts', 'custom_search_post_types' );
+
+// カスタムフィールド(description)も検索対象に含める
+function custom_search_join( $join, $query ) {
+	global $wpdb;
+	if ( $query->is_search() && $query->is_main_query() && ! is_admin() ) {
+		$join .= " LEFT JOIN {$wpdb->postmeta} AS search_meta ON ({$wpdb->posts}.ID = search_meta.post_id AND search_meta.meta_key = 'description')";
+	}
+	return $join;
+}
+add_filter( 'posts_join', 'custom_search_join', 10, 2 );
+
+function custom_search_where( $where, $query ) {
+	global $wpdb;
+	if ( $query->is_search() && $query->is_main_query() && ! is_admin() ) {
+		$search_term = $query->get( 's' );
+		$like = '%' . $wpdb->esc_like( $search_term ) . '%';
+		$where = preg_replace(
+			"/\({$wpdb->posts}\.post_title LIKE (.*?)\)/",
+			"({$wpdb->posts}.post_title LIKE $1) OR (search_meta.meta_value LIKE '" . esc_sql( $like ) . "')",
+			$where
+		);
+	}
+	return $where;
+}
+add_filter( 'posts_where', 'custom_search_where', 10, 2 );
+
+function custom_search_distinct( $distinct, $query ) {
+	if ( $query->is_search() && $query->is_main_query() && ! is_admin() ) {
+		return 'DISTINCT';
+	}
+	return $distinct;
+}
+add_filter( 'posts_distinct', 'custom_search_distinct', 10, 2 );
 
