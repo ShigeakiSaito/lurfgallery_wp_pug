@@ -70,14 +70,31 @@
 
 		<!-- ===== Section 05: 展示概要 ===== -->
 		<?php $overview = get_field('overview'); ?>
+		<?php $overview_table = get_field('overview_table'); ?>
 		<?php $overview_note = get_field('overview_note'); ?>
-		<?php if ($overview || $overview_note) : ?>
+		<?php if ($overview || $overview_table || $overview_note) : ?>
 		<section class="exhibition-detail__overview">
 			<?php if ($overview) : ?>
-			<?php echo $overview; ?>
+			<h3 class="exhibition-detail__overview-title">展示概要</h3>
+			<div class="exhibition-detail__overview-content">
+			<?php echo wp_kses_post($overview); ?>
+			</div>
+			<?php endif; ?>
+			<?php if ($overview_table) : ?>
+				<?php if ($overview_table['title']) : ?>
+			<p class="exhibition-detail__overview-subtitle"><?php echo esc_html($overview_table['title']); ?></p>
+				<?php endif; ?>
+			<ul class="exhibition-detail__overview-list">
+				<?php foreach ($overview_table['table'] as $item) : ?>
+			<li class="exhibition-detail__overview-item">
+				<span class="exhibition-detail__overview-label"><?php echo esc_html($item['term']); ?></span>
+				<span class="exhibition-detail__overview-value"><?php echo esc_html($item['description']); ?></span>
+			</li>
+				<?php endforeach; ?>
+			</ul>
 			<?php endif; ?>
 			<?php if ($overview_note) : ?>
-			<p><?php echo esc_html($overview_note); ?></p>
+			<p><?php echo wp_kses_post($overview_note); ?></p>
 			<?php endif; ?>
 		</section>
 		<?php endif; ?>
@@ -91,13 +108,13 @@
 			<div class="exhibition-detail__statement-upper">
 				<p class="exhibition-detail__statement-heading">Statement</p>
 				<div class="exhibition-detail__statement-body">
-					<?php echo nl2br(esc_html($statement)); ?>
+					<?php echo wp_kses_post($statement); ?>
 				</div>
 			</div>
 			<?php endif; ?>
 			<?php if ($contribution) : ?>
 			<div class="exhibition-detail__statement-lower">
-				<?php echo nl2br(esc_html($contribution)); ?>
+				<?php echo wp_kses_post($contribution); ?>
 			</div>
 			<?php endif; ?>
 		</section>
@@ -229,12 +246,32 @@
 
 		<!-- ===== Section 11: EVENTS ===== -->
 		<?php $events = get_field('events'); ?>
+		<?php $events_table = get_field('events_table'); ?>
+		<?php $events_note = get_field('events_note'); ?>
 		<?php if ($events) : ?>
 		<section class="exhibition-detail__events">
 			<h3 class="exhibition-detail__section-heading">Events</h3>
 			<div class="exhibition-detail__events-body">
-				<?php echo $events; ?>
+				<?php echo wp_kses_post($events); ?>
 			</div>
+			<?php if ($events_table) : ?>
+			<div class="exhibition-detail__event-detail">
+				<?php if ($events_table['title']) : ?>
+				<p class="exhibition-detail__event-subtitle"><?php echo esc_html($events_table['title']); ?></p>
+				<?php endif; ?>
+				<ul class="exhibition-detail__event-list">
+					<?php foreach ($events_table['table'] as $item) : ?>
+					<li class="exhibition-detail__event-item">
+						<span class="exhibition-detail__event-label"><?php echo esc_html($item['term']); ?></span>
+						<span class="exhibition-detail__event-value"><?php echo esc_html($item['description']); ?></span>
+					</li>
+					<?php endforeach; ?>
+				</ul>
+			</div>
+			<?php endif; ?>
+			<?php if ($events_note) : ?>
+			<div class="exhibition-detail__event-notes"><?php echo wp_kses_post($events_note); ?></div>
+			<?php endif; ?>
 		</section>
 		<?php endif; ?>
 
