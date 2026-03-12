@@ -57,12 +57,17 @@ function create_post_type()
 		array(
 			'labels' => array(
 				'name' => __('exhibitions'),
-				'singular_name' => __('exhibitions')
+				'singular_name' => __('exhibitions'),
+				'all_items' => __('一覧')
 			),
 			'public' => true,
 			'show_in_rest' => true,
 			// 'has_archive' => true,
 			'menu_position' => 4,
+			'rewrite' => array(
+				'slug' => 'exhibitions',
+				'with_front' => false,
+			),
 		)
 	);
 	// artfairs
@@ -71,12 +76,17 @@ function create_post_type()
 		array(
 			'labels' => array(
 				'name' => __('artfairs'),
-				'singular_name' => __('artfairs')
+				'singular_name' => __('artfairs'),
+				'all_items' => __('一覧')
 			),
 			'public' => true,
 			'show_in_rest' => true,
 			// 'has_archive' => true,
 			'menu_position' => 5,
+			'rewrite' => array(
+				'slug' => 'artfairs',
+				'with_front' => false,
+			),
 		)
 	);
 	// artists
@@ -85,12 +95,17 @@ function create_post_type()
 		array(
 			'labels' => array(
 				'name' => __('artists'),
-				'singular_name' => __('artists')
+				'singular_name' => __('artists'),
+				'all_items' => __('一覧')
 			),
 			'public' => true,
 			'show_in_rest' => true,
 			// 'has_archive' => true,
 			'menu_position' => 6,
+			'rewrite' => array(
+				'slug' => 'artists',
+				'with_front' => false,
+			),
 		)
 	);
 }
