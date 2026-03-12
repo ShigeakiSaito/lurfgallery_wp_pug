@@ -11,6 +11,38 @@ $post_type_labels = [
 	'page'        => 'Pages',
 ];
 
+/**
+ * 投稿タイプに応じたサムネイルURLを取得
+ */
+function get_search_thumbnail_url($post_id, $post_type) {
+	$noimage = get_template_directory_uri() . '/assets/img/common/noimage.png';
+
+	switch ($post_type) {
+		// Exhibitions / Art Fairs: main_visual グループの image
+		case 'exhibitions':
+		case 'artfairs':
+			$mv = get_field('main_visual', $post_id);
+			return !empty($mv['image']['url']) ? $mv['image']['url'] : $noimage;
+
+		// Artists: mv_images グループの pc
+		case 'artists':
+			$mv = get_field('mv_images', $post_id);
+			return !empty($mv['pc']['url']) ? $mv['pc']['url'] : $noimage;
+
+		// Artworks / Editions / Books: images リピーターの1枚目
+		case 'artworks':
+		case 'editions':
+		case 'books':
+			$images = get_field('images', $post_id);
+			return !empty($images[0]['image']['url']) ? $images[0]['image']['url'] : $noimage;
+
+		// News / 固定ページ: アイキャッチ画像
+		default:
+			$url = get_the_post_thumbnail_url($post_id, 'medium_large');
+			return $url ? $url : $noimage;
+	}
+}
+
 // 記事タイプごとにグループ化
 $grouped = [];
 if (have_posts()) {
@@ -70,11 +102,7 @@ foreach ($post_type_labels as $pt => $label) {
 					<li class="search-results__item">
 						<a href="<?php the_permalink(); ?>" class="news-card">
 							<figure class="news-card__img">
-								<?php if (has_post_thumbnail()) : ?>
-								<img src="<?php echo esc_url(get_the_post_thumbnail_url(get_the_ID(), 'medium_large')); ?>" alt="<?php the_title_attribute(); ?>" loading="lazy">
-								<?php else : ?>
-								<img src="<?php echo esc_url(get_template_directory_uri() . '/assets/img/common/noimage.png'); ?>" alt="" loading="lazy">
-								<?php endif; ?>
+								<img src="<?php echo esc_url(get_search_thumbnail_url(get_the_ID(), $pt)); ?>" alt="<?php the_title_attribute(); ?>" loading="lazy">
 							</figure>
 							<div class="news-card__body">
 								<div class="news-card__meta">
