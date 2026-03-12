@@ -155,138 +155,122 @@
 		<?php endif; ?>
 
 		<!-- ===== Section 08: CONTACTボタン（セクション間） ===== -->
+		<?php $contact_url = get_field('contact_url'); ?>
+		<?php if ($contact_url) : ?>
 		<div class="exhibition-detail__works-cta">
 			<p class="exhibition-detail__works-cta-text">販売作品リストをご希望の方は、お問い合わせよりご連絡ください</p>
-			<a href="/contact/" class="exhibition-detail__works-cta-button">CONTACT</a>
+			<a href="<?php echo esc_url($contact_url); ?>" class="exhibition-detail__works-cta-button">CONTACT</a>
 		</div>
+		<?php endif; ?>
 
 		<!-- ===== Section 09: EDITION ===== -->
+		<?php $editions = get_field('editions'); ?>
+		<?php if ($editions) : ?>
 		<section class="exhibition-detail__edition">
-			<h3 class="exhibition-detail__section-heading">Eddition</h3>
+			<h3 class="exhibition-detail__section-heading">Edition</h3>
 			<div class="exhibition-detail__edition-grid">
-				<a href="/exhibitions/edition/" class="exhibition-detail__edition-item">
+				<?php foreach ($editions as $edition) :
+					$ed_images = get_field('images', $edition->ID);
+					$ed_image = (!empty($ed_images[0]['image'])) ? $ed_images[0]['image'] : null;
+					$ed_artist = get_field('artist_name', $edition->ID);
+					$ed_title = get_field('title', $edition->ID);
+				?>
+				<a href="<?php echo esc_url(get_permalink($edition->ID)); ?>" class="exhibition-detail__edition-item">
+					<?php if ($ed_image) : ?>
 					<div class="exhibition-detail__edition-img">
-						<img src="/assets/img/exhibitions/img_exhibition-detail-work01.png" alt="Edition 1" loading="lazy">
+						<img src="<?php echo esc_url($ed_image['url']); ?>" alt="<?php echo esc_attr($ed_image['alt']); ?>" loading="lazy">
 					</div>
+					<?php endif; ?>
 					<div class="exhibition-detail__edition-info">
-						<p class="exhibition-detail__edition-artist">MAEDA Nobuaki</p>
-						<p class="exhibition-detail__edition-spec">UB21-0210, 2021,Acrylic and pigment on <br>canvas,200.7×185.0×7.5cm</p>
+						<?php if (!empty($ed_artist['value'])) : ?>
+						<p class="exhibition-detail__edition-artist"><?php echo esc_html($ed_artist['value']); ?></p>
+						<?php endif; ?>
+						<?php if (!empty($ed_title['value'])) : ?>
+						<p class="exhibition-detail__edition-spec"><?php echo esc_html($ed_title['value']); ?></p>
+						<?php endif; ?>
 					</div>
 				</a>
-				<a href="/exhibitions/edition/" class="exhibition-detail__edition-item">
-					<div class="exhibition-detail__edition-img">
-						<img src="/assets/img/exhibitions/img_exhibition-detail-work02.png" alt="Edition 2" loading="lazy">
-					</div>
-					<div class="exhibition-detail__edition-info">
-						<p class="exhibition-detail__edition-artist">會見 明也</p>
-						<p class="exhibition-detail__edition-spec">UB21-0210, 2021,Acrylic and pigment on <br>canvas,200.7×185.0×7.5cm</p>
-					</div>
-				</a>
-				<a href="/exhibitions/edition/" class="exhibition-detail__edition-item">
-					<div class="exhibition-detail__edition-img">
-						<img src="/assets/img/exhibitions/img_exhibition-detail-work03.png" alt="Edition 3" loading="lazy">
-					</div>
-					<div class="exhibition-detail__edition-info">
-						<p class="exhibition-detail__edition-artist">ヒロ杉山</p>
-						<p class="exhibition-detail__edition-spec">UB21-0210, 2021,Acrylic and pigment on <br>canvas,200.7×185.0×7.5cm</p>
-					</div>
-				</a>
+				<?php endforeach; ?>
 			</div>
 		</section>
+		<?php endif; ?>
 
 		<!-- ===== Section 10: BOOKS ===== -->
+		<?php $books = get_field('books'); ?>
+		<?php if ($books) : ?>
 		<section class="exhibition-detail__books">
 			<h3 class="exhibition-detail__section-heading">Books</h3>
 			<div class="exhibition-detail__books-grid">
-				<a href="/exhibitions/books/" class="exhibition-detail__books-item">
+				<?php foreach ($books as $book) :
+					$bk_images = get_field('images', $book->ID);
+					$bk_image = (!empty($bk_images[0]['image'])) ? $bk_images[0]['image'] : null;
+					$bk_artist = get_field('artist_name', $book->ID);
+					$bk_title = get_field('title', $book->ID);
+				?>
+				<a href="<?php echo esc_url(get_permalink($book->ID)); ?>" class="exhibition-detail__books-item">
+					<?php if ($bk_image) : ?>
 					<div class="exhibition-detail__books-img">
-						<img src="/assets/img/exhibitions/img_exhibition-detail-work01.png" alt="Book 1" loading="lazy">
+						<img src="<?php echo esc_url($bk_image['url']); ?>" alt="<?php echo esc_attr($bk_image['alt']); ?>" loading="lazy">
 					</div>
+					<?php endif; ?>
 					<div class="exhibition-detail__books-info">
-						<p class="exhibition-detail__books-artist">MAEDA Nobuaki</p>
-						<p class="exhibition-detail__books-spec">UB21-0210, 2021,Acrylic and pigment on <br>canvas,200.7×185.0×7.5cm</p>
+						<?php if (!empty($bk_artist['value'])) : ?>
+						<p class="exhibition-detail__books-artist"><?php echo esc_html($bk_artist['value']); ?></p>
+						<?php endif; ?>
+						<?php if (!empty($bk_title['value'])) : ?>
+						<p class="exhibition-detail__books-spec"><?php echo esc_html($bk_title['value']); ?></p>
+						<?php endif; ?>
 					</div>
 				</a>
-				<a href="/exhibitions/books/" class="exhibition-detail__books-item">
-					<div class="exhibition-detail__books-img">
-						<img src="/assets/img/exhibitions/img_exhibition-detail-work02.png" alt="Book 2" loading="lazy">
-					</div>
-					<div class="exhibition-detail__books-info">
-						<p class="exhibition-detail__books-artist">會見 明也</p>
-						<p class="exhibition-detail__books-spec">UB21-0210, 2021,Acrylic and pigment on <br>canvas,200.7×185.0×7.5cm</p>
-					</div>
-				</a>
-				<a href="/exhibitions/books/" class="exhibition-detail__books-item">
-					<div class="exhibition-detail__books-img">
-						<img src="/assets/img/exhibitions/img_exhibition-detail-work03.png" alt="Book 3" loading="lazy">
-					</div>
-					<div class="exhibition-detail__books-info">
-						<p class="exhibition-detail__books-artist">ヒロ杉山</p>
-						<p class="exhibition-detail__books-spec">UB21-0210, 2021,Acrylic and pigment on <br>canvas,200.7×185.0×7.5cm</p>
-					</div>
-				</a>
+				<?php endforeach; ?>
 			</div>
 		</section>
+		<?php endif; ?>
 
 		<!-- ===== Section 11: EVENTS ===== -->
+		<?php $events = get_field('events'); ?>
+		<?php if ($events) : ?>
 		<section class="exhibition-detail__events">
 			<h3 class="exhibition-detail__section-heading">Events</h3>
 			<div class="exhibition-detail__events-body">
-				<div class="exhibition-detail__event-header">
-					<h4 class="exhibition-detail__event-title">トークセッションのお知らせ</h4>
-					<p class="exhibition-detail__event-text">あのイーハトーヴォのすきとおった風、夏でも底に冷たさをもつ青いそら、うつくしい森で飾られたモリーオ市、郊外のぎらぎらひかる草の波。 またそのなかでいっしょになったたくさんのひとたち、ファゼーロとロザーロ、羊飼のミーロや、顔の赤いこどもたち、地主のテーモ、山猫博士のボーガント・デストゥパーゴなど、いまこの暗い巨きな石の建物のなかで考えていると、みんなむかし風のなつかしい青い幻燈のように思われます。</p>
-				</div>
-				<div class="exhibition-detail__event-detail">
-					<p class="exhibition-detail__event-subtitle">トークセッション</p>
-					<ul class="exhibition-detail__event-list">
-						<li class="exhibition-detail__event-item">
-							<span class="exhibition-detail__event-label">会期</span>
-							<span class="exhibition-detail__event-value">2025年8月2日(土)～9月1日(月)</span>
-						</li>
-						<li class="exhibition-detail__event-item">
-							<span class="exhibition-detail__event-label">会場</span>
-							<span class="exhibition-detail__event-value">LURF GALLERY 1F・2F</span>
-						</li>
-						<li class="exhibition-detail__event-item">
-							<span class="exhibition-detail__event-label">時間</span>
-							<span class="exhibition-detail__event-value">11：00 - 19：00</span>
-						</li>
-						<li class="exhibition-detail__event-item">
-							<span class="exhibition-detail__event-label">住所</span>
-							<span class="exhibition-detail__event-value">150-0033 東京都渋谷区猿楽町28-13 Roob1</span>
-						</li>
-						<li class="exhibition-detail__event-item">
-							<span class="exhibition-detail__event-label">入場</span>
-							<span class="exhibition-detail__event-value">無料</span>
-						</li>
-					</ul>
-					<div class="exhibition-detail__event-notes">
-						<p>※当日は席に限りがございますため、立ち見でのご鑑賞をお願いする場合がございます。</p>
-						<p>※混雑の状況により、入場を一時制限させていただく場合がございます。</p>
-					</div>
-				</div>
+				<?php echo $events; ?>
 			</div>
 		</section>
+		<?php endif; ?>
 
 		<!-- ===== Section 12: ARTISTS ===== -->
+		<?php $artists = get_field('artists'); ?>
+		<?php if ($artists) : ?>
 		<section class="exhibition-detail__artists">
 			<h3 class="exhibition-detail__section-heading">Artists</h3>
 			<div class="exhibition-detail__artists-list">
+				<?php foreach ($artists as $artist) :
+					$ar_mv = get_field('mv_images', $artist->ID);
+					$ar_image = (!empty($ar_mv['pc'])) ? $ar_mv['pc'] : null;
+					$ar_description = get_field('description', $artist->ID);
+				?>
 				<div class="exhibition-detail__artist-item">
+					<?php if ($ar_image) : ?>
 					<div class="exhibition-detail__artist-img">
-						<img src="/assets/img/artfairs/img_artfairs-artists01.png" alt="AIKA NAGANO" loading="lazy">
+						<img src="<?php echo esc_url($ar_image['url']); ?>" alt="<?php echo esc_attr($ar_image['alt']); ?>" loading="lazy">
 					</div>
+					<?php endif; ?>
 					<div class="exhibition-detail__artist-info">
-						<p class="exhibition-detail__artist-name">AIKA NAGANO</p>
-						<p class="exhibition-detail__artist-name-ja">永野 愛佳</p>
-						<p class="exhibition-detail__artist-bio">無限空間である"間"を有限のものとして。日本絵画における画面の構成は図と余白である"間"が重要視されるが、自身の作品では余白の間を光と捉え、画面の地、つまり"有限の間"をメインとしている。本来触れる事のなかった無限の間に光として白い地を与え、時間や湿度、季節などの機微を含み作者の肉感を得ることを狙いとした。ものとものの間隔…</p>
-						<a href="/artist/sample/" class="u-link-more">Learn more</a>
+						<p class="exhibition-detail__artist-name"><?php echo esc_html(get_the_title($artist->ID)); ?></p>
+						<?php if ($ar_description) : ?>
+						<p class="exhibition-detail__artist-bio"><?php echo esc_html($ar_description); ?></p>
+						<?php endif; ?>
+						<a href="<?php echo esc_url(get_permalink($artist->ID)); ?>" class="u-link-more">Learn more</a>
 					</div>
 				</div>
+				<?php endforeach; ?>
 			</div>
 		</section>
+		<?php endif; ?>
 
 		<!-- ===== Section 13: INSTALLATION VIEWS ===== -->
+		<?php $installation_views = get_field('installation_views'); ?>
+		<?php if ($installation_views) : ?>
 		<section class="exhibition-detail__installation">
 			<h3 class="exhibition-detail__section-heading">Installation Views</h3>
 			<div class="exhibition-detail__installation-nav">
@@ -294,67 +278,89 @@
 				<span class="exhibition-detail__installation-counter">
 					<span class="js-installation-current">1</span>
 					<span class="exhibition-detail__installation-separator">/</span>
-					<span class="js-installation-total">6</span>
+					<span class="js-installation-total"><?php echo count($installation_views); ?></span>
 				</span>
 				<button class="exhibition-detail__installation-next js-installation-next" aria-label="次の画像"></button>
 			</div>
 			<div class="exhibition-detail__installation-slider">
 				<div class="swiper js-installation-swiper" id="installationSwiper">
 					<div class="swiper-wrapper">
+						<?php foreach ($installation_views as $index => $view) : ?>
 						<div class="swiper-slide">
-							<img src="/assets/img/artfairs/img_artfairs-installation01.png" alt="展示風景 1" loading="lazy">
+							<img src="<?php echo esc_url($view['item']['url']); ?>" alt="<?php echo esc_attr($view['item']['alt'] ?: '展示風景 ' . ($index + 1)); ?>" loading="lazy">
 						</div>
-						<div class="swiper-slide">
-							<img src="/assets/img/artfairs/img_artfairs-installation01.png" alt="展示風景 2" loading="lazy">
-						</div>
-						<div class="swiper-slide">
-							<img src="/assets/img/artfairs/img_artfairs-installation01.png" alt="展示風景 3" loading="lazy">
-						</div>
-						<div class="swiper-slide">
-							<img src="/assets/img/artfairs/img_artfairs-installation01.png" alt="展示風景 4" loading="lazy">
-						</div>
-						<div class="swiper-slide">
-							<img src="/assets/img/artfairs/img_artfairs-installation01.png" alt="展示風景 5" loading="lazy">
-						</div>
-						<div class="swiper-slide">
-							<img src="/assets/img/artfairs/img_artfairs-installation01.png" alt="展示風景 6" loading="lazy">
-						</div>
+						<?php endforeach; ?>
 					</div>
 				</div>
 			</div>
 		</section>
+		<?php endif; ?>
 
 		<!-- ===== Section 14: FILM ===== -->
+		<?php $film = get_field('film'); ?>
+		<?php if (!empty($film['youtube_url'])) : ?>
+		<?php
+		// YouTube URL を埋め込み用に変換
+		$youtube_embed_url = '';
+		if (preg_match('/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/))([a-zA-Z0-9_-]+)/', $film['youtube_url'], $matches)) {
+			$youtube_embed_url = 'https://www.youtube.com/embed/' . $matches[1];
+		}
+		?>
 		<section class="exhibition-detail__film">
 			<div class="exhibition-detail__film-header">
 				<h3 class="exhibition-detail__section-heading">Film</h3>
-				<a href="https://www.youtube.com/" class="exhibition-detail__film-link" target="_blank" rel="noopener noreferrer">
+				<?php if (!empty($film['see_more_on_youtube_url'])) : ?>
+				<a href="<?php echo esc_url($film['see_more_on_youtube_url']); ?>" class="exhibition-detail__film-link" target="_blank" rel="noopener noreferrer">
 					See more on Youtube
 					<svg class="exhibition-detail__film-link-icon" width="24" height="24" viewBox="0 0 24 24"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8-8-8z" fill="currentColor"></path></svg>
 				</a>
+				<?php endif; ?>
 			</div>
+			<?php if ($youtube_embed_url) : ?>
 			<div class="exhibition-detail__film-content">
 				<div class="exhibition-detail__film-player">
-					<iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" title="着想と実行 Exhibition Film" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+					<iframe src="<?php echo esc_url($youtube_embed_url); ?>" title="Exhibition Film" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
 				</div>
-				<p class="exhibition-detail__film-caption">「着想と実行 Inspiration and Execution」展示記録映像</p>
+				<?php if (!empty($film['caption'])) : ?>
+				<p class="exhibition-detail__film-caption"><?php echo esc_html($film['caption']); ?></p>
+				<?php endif; ?>
 			</div>
+			<?php endif; ?>
+			<?php if (!empty($film['event_title']) || !empty($film['event_description'])) : ?>
 			<div class="exhibition-detail__film-body">
-				<h4 class="exhibition-detail__film-title">トークセッションのお知らせ</h4>
-				<p class="exhibition-detail__film-text">あのイーハトーヴォのすきとおった風、夏でも底に冷たさをもつ青いそら、うつくしい森で飾られたモリーオ市、郊外のぎらぎらひかる草の波。 またそのなかでいっしょになったたくさんのひとたち、ファゼーロとロザーロ、羊飼のミーロや、顔の赤いこどもたち、地主のテーモ、山猫博士のボーガント・デストゥパーゴなど、いまこの暗い巨きな石の建物のなかで考えていると、みんなむかし風のなつかしい青い幻燈のように思われます。</p>
+				<?php if (!empty($film['event_title'])) : ?>
+				<h4 class="exhibition-detail__film-title"><?php echo esc_html($film['event_title']); ?></h4>
+				<?php endif; ?>
+				<?php if (!empty($film['event_description'])) : ?>
+				<p class="exhibition-detail__film-text"><?php echo nl2br(esc_html($film['event_description'])); ?></p>
+				<?php endif; ?>
 			</div>
+			<?php endif; ?>
 		</section>
+		<?php endif; ?>
 
 		<!-- ===== Section 15: PRODUCT ===== -->
+		<?php $product = get_field('product'); ?>
+		<?php if (!empty($product['image']) || !empty($product['description'])) : ?>
 		<section class="exhibition-detail__product">
 			<h3 class="exhibition-detail__section-heading">Product</h3>
+			<?php if (!empty($product['image'])) : ?>
 			<div class="exhibition-detail__product-content">
 				<div class="exhibition-detail__product-img">
-					<img src="/assets/img/artfairs/img_artfairs-product01.png" alt="Exhibition Product" loading="lazy">
+					<img src="<?php echo esc_url($product['image']['url']); ?>" alt="<?php echo esc_attr($product['image']['alt']); ?>" loading="lazy">
 				</div>
 			</div>
-			<p class="exhibition-detail__product-text">あのイーハトーヴォのすきとおった風、夏でも底に冷たさをもつ青いそら、うつくしい森で飾られたモリーオ市、郊外のぎらぎらひかる草の波。 またそのなかでいっしょになったたくさんのひとたち、ファゼーロとロザーロ、羊飼のミーロや、顔の赤いこどもたち、地主のテーモ、山猫博士のボーガント・デストゥパーゴなど、いまこの暗い巨きな石の建物のなかで考えていると、みんなむかし風のなつかしい青い幻燈のように思われます。</p>
+			<?php endif; ?>
+			<?php if (!empty($product['description'])) : ?>
+			<p class="exhibition-detail__product-text"><?php echo nl2br(esc_html($product['description'])); ?></p>
+			<?php endif; ?>
+			<?php if (!empty($product['shop_name']) && !empty($product['shop_url'])) : ?>
+			<p class="exhibition-detail__product-shop">
+				<a href="<?php echo esc_url($product['shop_url']); ?>" target="_blank" rel="noopener noreferrer"><?php echo esc_html($product['shop_name']); ?></a>
+			</p>
+			<?php endif; ?>
 		</section>
+		<?php endif; ?>
 
 	</main>
 
@@ -364,14 +370,15 @@
 			var installEl = document.querySelector('.js-installation-swiper');
 			if (installEl) {
 				var installSlides = installEl.querySelectorAll('.swiper-slide');
+				var slideCount = installSlides.length;
 				var installTotal = document.querySelector('.js-installation-total');
 				var installCurrent = document.querySelector('.js-installation-current');
 				var installNav = document.querySelector('.exhibition-detail__installation-nav');
 
-				if (installSlides.length <= 1) {
+				if (slideCount <= 1) {
 					if (installNav) installNav.style.display = 'none';
 				} else {
-					if (installTotal) installTotal.textContent = installSlides.length;
+					if (installTotal) installTotal.textContent = slideCount;
 
 					function getInstallGap() {
 						return window.innerWidth >= 768
@@ -379,8 +386,12 @@
 							: 16;
 					}
 
+					// loopにはslidesPerViewの2倍以上のスライドが必要
+					var isPC = window.innerWidth >= 768;
+					var canLoop = isPC ? slideCount > 4 : slideCount > 2;
+
 					var installSwiper = new Swiper('#installationSwiper', {
-						loop: true,
+						loop: canLoop,
 						speed: 600,
 						slidesPerView: 1,
 						spaceBetween: getInstallGap(),
@@ -396,7 +407,8 @@
 						on: {
 							slideChange: function() {
 								if (installCurrent) {
-									installCurrent.textContent = this.realIndex + 1;
+									var index = canLoop ? this.realIndex : this.activeIndex;
+									installCurrent.textContent = index + 1;
 								}
 							}
 						}
