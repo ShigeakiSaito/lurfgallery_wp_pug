@@ -247,7 +247,7 @@
 				<?php foreach ($artists as $artist) :
 					$ar_mv = get_field('mv_images', $artist->ID);
 					$ar_image = (!empty($ar_mv['pc'])) ? $ar_mv['pc'] : null;
-					$ar_description = get_field('description', $artist->ID);
+					$ar_description = get_field('overview', $artist->ID)['profile'] ?? '';
 				?>
 				<div class="exhibition-detail__artist-item">
 					<?php if ($ar_image) : ?>
@@ -356,7 +356,7 @@
 			<?php endif; ?>
 			<?php if (!empty($product['shop_name']) && !empty($product['shop_url'])) : ?>
 			<p class="exhibition-detail__product-shop">
-				<a href="<?php echo esc_url($product['shop_url']); ?>" target="_blank" rel="noopener noreferrer"><?php echo esc_html($product['shop_name']); ?></a>
+				<?php echo esc_html($product['shop_name']); ?> : <a href="<?php echo esc_url($product['shop_url']); ?>" target="_blank" rel="noopener noreferrer"><?php echo esc_html($product['shop_url']); ?></a>
 			</p>
 			<?php endif; ?>
 		</section>
