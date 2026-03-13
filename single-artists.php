@@ -301,7 +301,8 @@ $artworks_initial_rows = 5; // PC版で表示する行数
 						<?php foreach ($exhibitions as $exh) :
 						  // $exh はACFの投稿オブジェクト
 							$exh_id = is_object($exh) ? $exh->ID : $exh;
-							$exh_title = get_the_title($exh_id);
+							$exh_title = get_field('main_visual', $exh_id)['text1'] ?? get_the_title($exh_id); // タイトル
+							$exh_subtitle = get_field('main_visual', $exh_id)['text2'] ?? ''; // サブタイトル
 							$exh_images = get_field('main_visual', $exh_id); // 画像配列
 							$exh_image_url = '';
 							$exh_image_alt = '';
@@ -310,15 +311,28 @@ $artworks_initial_rows = 5; // PC版で表示する行数
 								$exh_image_url = esc_url($exh_images['image']['url']);
 								$exh_image_alt = esc_attr($exh_images['image']['alt'] ?? '');
 							}
+							$exh_artists = get_field('artists', $exh_id); // アーティスト名配列
+							$exh_artist_text = '';
+							if ($exh_artists && is_array($exh_artists)) {
+								$artist_names = [];
+								foreach ($exh_artists as $artist) {
+									if (is_object($artist)) {
+										$artist_names[] = get_field('overview', $artist->ID)['name2'] ?? get_the_title($artist->ID);
+									}
+								}
+								$exh_artist_text = implode('✕', $artist_names);
+							}
 						?>
 						<div class="swiper-slide">
 							<a href="<?php echo get_permalink($exh_id); ?>" class="artist-detail__exh-card">
 								<div class="artist-detail__exh-card-img">
 									<img src="<?php echo $exh_image_url; ?>" alt="<?php echo $exh_image_alt; ?>" loading="lazy">
 								</div>
-								<p class="artist-detail__exh-card-artist">アーティスト</p>
+								<p class="artist-detail__exh-card-artist"><?php echo esc_html($exh_artist_text); ?></p>
 								<p class="artist-detail__exh-card-title"><?php echo esc_html($exh_title); ?></p>
-								<p class="artist-detail__exh-card-subtitle">サブタイトル</p>
+								<?php if ($exh_subtitle) : ?>
+								<p class="artist-detail__exh-card-subtitle"><?php echo esc_html($exh_subtitle); ?></p>
+								<?php endif; ?>
 								<p class="artist-detail__exh-card-period">会期</p>
 							</a>
 						</div>
