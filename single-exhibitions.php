@@ -152,28 +152,39 @@
 
 		<!-- ===== Section 07: FEATURED WORKS ===== -->
 		<?php $featured_works = get_field('featured_works'); ?>
-		<?php if ($featured_works) : ?>
-		<?php
-		$col = get_field('featured_works_column');
-		$col = in_array($col, ['1', '2', '3']) ? $col : '3';
-		?>
+		<?php if (!empty($featured_works['set'])) : ?>
+		<?php $works_initial_rows = 1; ?>
 		<section class="exhibition-detail__works">
 			<h3 class="exhibition-detail__section-heading">Featured Works</h3>
-			<div class="exhibition-detail__works-grid">
-				<div class="exhibition-detail__works-row exhibition-detail__works-row--col<?php echo $col; ?>">
-					<?php
-					$visible_count = (int) $col * 5;
-					foreach ($featured_works as $index => $work) :
-						$work_images = get_field('images', $work->ID);
+			<div class="exhibition-detail__works-grid" id="js-works-grid">
+				<?php
+				$sets = $featured_works['set'];
+				foreach ($sets as $set) :
+					$columns = $set['column'] ?? 'col3';
+					$works = $set['works'] ?? [];
+					if (empty($works)) continue;
+
+					// カラム数から初期表示件数を算出
+					$col_count = ($columns === 'col1') ? 1 : (($columns === 'col2') ? 2 : 3);
+					$initial_visible = $col_count * $works_initial_rows;
+				?>
+				<div class="exhibition-detail__works-row exhibition-detail__works-row--<?php echo esc_attr($columns); ?>"
+					data-col-count="<?php echo esc_attr($col_count); ?>"
+					data-initial-rows="<?php echo esc_attr($works_initial_rows); ?>">
+					<?php foreach ($works as $index => $work) :
+						$work_id = is_object($work) ? $work->ID : $work;
+						$work_images = get_field('images', $work_id);
 						$work_image = '';
 						if ($work_images && !empty($work_images[0]['image'])) {
 							$work_image = $work_images[0]['image'];
 						}
-						$work_artist = get_field('artist_name', $work->ID);
-						$work_title_field = get_field('title', $work->ID);
-						$is_hidden = $index >= $visible_count;
+						$work_artist = get_field('artist_name', $work_id);
+						$work_title_field = get_field('title', $work_id);
+
+						// 初期表示件数を超えたら is-hidden を付与
+						$hidden_class = ($index >= $initial_visible) ? ' is-hidden' : '';
 					?>
-					<a href="<?php echo esc_url(get_permalink($work->ID)); ?>" class="exhibition-detail__work<?php echo $is_hidden ? ' is-hidden' : ''; ?>">
+					<a href="<?php echo esc_url(get_permalink($work_id)); ?>" class="exhibition-detail__work<?php echo $hidden_class; ?>">
 						<?php if ($work_image) : ?>
 						<div class="exhibition-detail__work-img">
 							<img src="<?php echo esc_url($work_image['url']); ?>" alt="<?php echo esc_attr($work_image['alt']); ?>" loading="lazy">
@@ -190,14 +201,13 @@
 					</a>
 					<?php endforeach; ?>
 				</div>
+				<?php if (count($works) > $initial_visible) : ?>
+				<div class="exhibition-detail__works-more js-works-more">
+					<button type="button" class="u-button-more u-button-more--border">View more</button>
+				</div>
+				<?php endif; ?>
+				<?php endforeach; ?>
 			</div>
-
-			<?php if (count($featured_works) > $visible_count) : ?>
-			<!-- View more -->
-			<div class="exhibition-detail__works-more" id="js-exhibition-works-more">
-				<button type="button" class="u-button-more u-button-more--border">View more</button>
-			</div>
-			<?php endif; ?>
 		</section>
 		<?php endif; ?>
 
@@ -314,7 +324,10 @@
 				<?php foreach ($artists as $artist) :
 					$ar_mv = get_field('mv_images', $artist->ID);
 					$ar_image = (!empty($ar_mv['pc'])) ? $ar_mv['pc'] : null;
-					$ar_description = get_field('overview', $artist->ID)['profile'] ?? '';
+					$ar_overview = get_field('overview', $artist->ID);
+					$ar_name1 = $ar_overview['name1'] ?? get_the_title($artist->ID);
+					$ar_name2 = $ar_overview['name2'] ?? '';
+					$ar_description = $ar_overview['profile'] ?? '';
 				?>
 				<div class="exhibition-detail__artist-item">
 					<?php if ($ar_image) : ?>
@@ -323,7 +336,10 @@
 					</div>
 					<?php endif; ?>
 					<div class="exhibition-detail__artist-info">
-						<p class="exhibition-detail__artist-name"><?php echo esc_html(get_the_title($artist->ID)); ?></p>
+						<p class="exhibition-detail__artist-name"><?php echo esc_html($ar_name1); ?></p>
+						<?php if ($ar_name2) : ?>
+						<p class="exhibition-detail__artist-name-ja"><?php echo esc_html($ar_name2); ?></p>
+						<?php endif; ?>
 						<?php if ($ar_description) : ?>
 						<p class="exhibition-detail__artist-bio"><?php echo esc_html($ar_description); ?></p>
 						<?php endif; ?>
@@ -490,35 +506,29 @@
 
 		});
 
-	// ----- View more (FEATURED WORKS) -----
-	const worksList = document.querySelector('.exhibition-detail__works-grid');
-	const worksMoreWrap = document.getElementById('js-exhibition-works-more');
+	// ----- View more (FEATURED WORKS: row ごとに独立) -----
+	document.querySelectorAll('.js-works-more').forEach(moreWrap => {
+		const row = moreWrap.previousElementSibling;
+		if (!row || !row.classList.contains('exhibition-detail__works-row')) return;
 
-	if (worksList && worksMoreWrap) {
-		const worksBtn = worksMoreWrap.querySelector('.u-button-more');
+		const moreBtn = moreWrap.querySelector('.u-button-more');
+		const colCount = parseInt(row.dataset.colCount, 10) || 3;
 
-		const getShowCount = (item) => {
-			const row = item.closest('.exhibition-detail__works-row');
-			if (row?.classList.contains('exhibition-detail__works-row--col1')) return 1;
-			if (row?.classList.contains('exhibition-detail__works-row--col2')) return 2;
-			return 3;
-		};
-
-		const updateWorksMoreVisibility = () => {
-			const hiddenItems = worksList.querySelectorAll('.exhibition-detail__work.is-hidden');
+		const updateMoreVisibility = () => {
+			const hiddenItems = row.querySelectorAll('.exhibition-detail__work.is-hidden');
 			if (hiddenItems.length === 0) {
-				worksMoreWrap.style.display = 'none';
+				moreWrap.style.display = 'none';
 			}
 		};
 
-		updateWorksMoreVisibility();
+		updateMoreVisibility();
 
-		if (worksBtn) {
-			worksBtn.addEventListener('click', () => {
-				const hiddenItems = worksList.querySelectorAll('.exhibition-detail__work.is-hidden');
+		if (moreBtn) {
+			moreBtn.addEventListener('click', () => {
+				const hiddenItems = row.querySelectorAll('.exhibition-detail__work.is-hidden');
 				if (hiddenItems.length === 0) return;
 
-				const showCount = Math.min(getShowCount(hiddenItems[0]), hiddenItems.length);
+				const showCount = Math.min(colCount, hiddenItems.length);
 
 				for (let i = 0; i < showCount; i++) {
 					const item = hiddenItems[i];
@@ -530,10 +540,10 @@
 					}, { once: true });
 				}
 
-				updateWorksMoreVisibility();
+				updateMoreVisibility();
 			});
 		}
-	}
+	});
 	</script>
 
 <?php get_footer(); ?>
