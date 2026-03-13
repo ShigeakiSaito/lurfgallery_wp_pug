@@ -70,9 +70,9 @@
 
 		<!-- ===== Section 05: 展示概要 ===== -->
 		<?php $overview = get_field('overview'); ?>
-		<?php $overview_table = get_field('overview_table'); ?>
+		<?php $overview_data = get_field('overview_data'); ?>
 		<?php $overview_note = get_field('overview_note'); ?>
-		<?php if ($overview || $overview_table || $overview_note) : ?>
+		<?php if ($overview || $overview_data || $overview_note) : ?>
 		<section class="exhibition-detail__overview">
 			<?php if ($overview) : ?>
 			<h3 class="exhibition-detail__overview-title">展示概要</h3>
@@ -80,17 +80,47 @@
 			<?php echo wp_kses_post($overview); ?>
 			</div>
 			<?php endif; ?>
-			<?php if ($overview_table) : ?>
-				<?php if ($overview_table['title']) : ?>
-			<p class="exhibition-detail__overview-subtitle"><?php echo esc_html($overview_table['title']); ?></p>
+			<?php if ($overview_data) : ?>
+				<?php if ($overview_data['title']) : ?>
+			<p class="exhibition-detail__overview-subtitle"><?php echo esc_html($overview_data['title']); ?></p>
 				<?php endif; ?>
 			<ul class="exhibition-detail__overview-list">
-				<?php foreach ($overview_table['table'] as $item) : ?>
-			<li class="exhibition-detail__overview-item">
-				<span class="exhibition-detail__overview-label"><?php echo esc_html($item['term']); ?></span>
-				<span class="exhibition-detail__overview-value"><?php echo esc_html($item['description']); ?></span>
-			</li>
-				<?php endforeach; ?>
+				<?php if (!empty($overview_data['period'])): ?>
+				<li class="exhibition-detail__overview-item">
+					<span class="exhibition-detail__overview-label">会期</span>
+					<span class="exhibition-detail__overview-value"><?php echo esc_html($overview_data['period']); ?></span>
+				</li>
+				<?php endif; ?>
+				<?php if (!empty($overview_data['place'])): ?>
+				<li class="exhibition-detail__overview-item">
+					<span class="exhibition-detail__overview-label">会場</span>
+					<span class="exhibition-detail__overview-value"><?php echo esc_html($overview_data['place']); ?></span>
+				</li>
+				<?php endif; ?>
+				<?php if (!empty($overview_data['hours'])): ?>
+				<li class="exhibition-detail__overview-item">
+					<span class="exhibition-detail__overview-label">時間</span>
+					<span class="exhibition-detail__overview-value"><?php echo esc_html($overview_data['hours']); ?></span>
+				</li>
+				<?php endif; ?>
+				<?php if (!empty($overview_data['address'])): ?>
+				<li class="exhibition-detail__overview-item">
+					<span class="exhibition-detail__overview-label">住所</span>
+					<span class="exhibition-detail__overview-value"><?php echo esc_html($overview_data['address']); ?></span>
+				</li>
+				<?php endif; ?>
+				<?php if (!empty($overview_data['price'])): ?>
+				<li class="exhibition-detail__overview-item">
+					<span class="exhibition-detail__overview-label">入場</span>
+					<span class="exhibition-detail__overview-value"><?php echo esc_html($overview_data['price']); ?></span>
+				</li>
+				<?php endif; ?>
+				<?php if (!empty($overview_data['note'])): ?>
+				<li class="exhibition-detail__overview-item">
+					<span class="exhibition-detail__overview-label">備考</span>
+					<span class="exhibition-detail__overview-value"><?php echo nl2br(esc_html($overview_data['note'])); ?></span>
+				</li>
+				<?php endif; ?>
 			</ul>
 			<?php endif; ?>
 			<?php if ($overview_note) : ?>
