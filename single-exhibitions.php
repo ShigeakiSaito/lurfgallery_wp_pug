@@ -221,6 +221,28 @@
 					$ed_image = (!empty($ed_images[0]['image'])) ? $ed_images[0]['image'] : null;
 					$ed_artist = get_field('artist_name', $edition->ID);
 					$ed_title = get_field('title', $edition->ID);
+					$ed_year = get_field('year', $edition->ID);
+					$ed_material = get_field('material', $edition->ID);
+					$ed_edition = get_field('edition', $edition->ID);
+					$ed_sign = get_field('sign', $edition->ID);
+					$ed_frame = get_field('frame', $edition->ID);
+					$ed_size = get_field('size', $edition->ID);
+					$ed_description = get_field('description', $edition->ID);
+					$ed_note = get_field('note', $edition->ID);
+					// 説明文生成
+					$ed_artist = (!empty($ed_artist['is_display']) && !empty($ed_artist['value'])) ? $ed_artist['value'] : null;
+					$ed_title = (!empty($ed_title['is_display']) && !empty($ed_title['value'])) ? $ed_title['value'] : null;
+					$ed_year = (!empty($ed_year['is_display']) && !empty($ed_year['value'])) ? $ed_year['value'] : null;
+					$ed_material = (!empty($ed_material['is_display']) && !empty($ed_material['value'])) ? $ed_material['value'] : null;
+					$ed_edition = (!empty($ed_edition['is_display']) && !empty($ed_edition['value'])) ? $ed_edition['value'] : null;
+					$ed_sign = (!empty($ed_sign['is_display']) && !empty($ed_sign['value'])) ? $ed_sign['value'] : null;
+					$ed_frame = (!empty($ed_frame['is_display']) && !empty($ed_frame['value'])) ? $ed_frame['value'] : null;
+					$ed_size = (!empty($ed_size['is_display']) && !empty($ed_size['value'])) ? $ed_size['value'] : null;
+					$ed_description = (!empty($ed_description['is_display']) && !empty($ed_description['value'])) ? $ed_description['value'] : null;
+					$ed_note = (!empty($ed_note['is_display']) && !empty($ed_note['value'])) ? $ed_note['value'] : null;
+
+					$spec_line1 = implode(', ', array_filter([$ed_title, $ed_year, $ed_material]));
+					$spec_line2 = implode(', ', array_filter([$ed_edition, $ed_sign, $ed_frame, $ed_description, $ed_note]));
 				?>
 				<a href="<?php echo esc_url(get_permalink($edition->ID)); ?>" class="exhibition-detail__edition-item">
 					<?php if ($ed_image) : ?>
@@ -229,11 +251,14 @@
 					</div>
 					<?php endif; ?>
 					<div class="exhibition-detail__edition-info">
-						<?php if (!empty($ed_artist['value'])) : ?>
-						<p class="exhibition-detail__edition-artist"><?php echo esc_html($ed_artist['value']); ?></p>
+						<?php if (!empty($ed_artist)) : ?>
+						<p class="exhibition-detail__edition-artist"><?php echo esc_html($ed_artist); ?></p>
 						<?php endif; ?>
-						<?php if (!empty($ed_title['value'])) : ?>
-						<p class="exhibition-detail__edition-spec"><?php echo esc_html($ed_title['value']); ?></p>
+						<?php if ($spec_line1) : ?>
+						<p class="exhibition-detail__edition-spec"><?php echo esc_html($spec_line1); ?></p>
+						<?php endif; ?>
+						<?php if ($spec_line2) : ?>
+						<p class="exhibition-detail__edition-spec"><?php echo esc_html($spec_line2); ?></p>
 						<?php endif; ?>
 					</div>
 				</a>
