@@ -150,7 +150,7 @@
 				<?php
 				$sets = $featured_works['set'];
 				foreach ($sets as $set) :
-					$columns = $set['column'] ?? 'col3';
+					$columns = $set['columns'] ?? 'col3';
 					$works = $set['works'] ?? [];
 					if (empty($works)) continue;
 
@@ -202,11 +202,11 @@
 		<?php endif; ?>
 
 		<!-- ===== Section 08: CONTACTボタン（セクション間） ===== -->
-		<?php $contact_url = get_field('contact_url'); ?>
-		<?php if ($contact_url) : ?>
+		<?php $contact2 = get_field('contact2'); ?>
+		<?php if ($contact2) : ?>
 		<div class="exhibition-detail__works-cta">
 			<p class="exhibition-detail__works-cta-text">販売作品リストをご希望の方は、お問い合わせよりご連絡ください</p>
-			<a href="<?php echo esc_url($contact_url); ?>" class="exhibition-detail__works-cta-button">CONTACT</a>
+			<a href="<?php echo home_url('contact/'); ?>" class="exhibition-detail__works-cta-button">CONTACT</a>
 		</div>
 		<?php endif; ?>
 
