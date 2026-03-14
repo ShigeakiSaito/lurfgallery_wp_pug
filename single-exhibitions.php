@@ -76,7 +76,7 @@
 		<section class="exhibition-detail__overview">
 			<?php if ($overview) : ?>
 			<h3 class="exhibition-detail__overview-title">展示概要</h3>
-			<div class="exhibition-detail__overview-content">
+			<div class="exhibition-detail__overview-content wysiwyg">
 			<?php echo wp_kses_post($overview); ?>
 			</div>
 			<?php endif; ?>
@@ -325,20 +325,31 @@
 		<?php if ($events) : ?>
 		<section class="exhibition-detail__events">
 			<h3 class="exhibition-detail__section-heading">Events</h3>
-			<div class="exhibition-detail__events-body">
+			<div class="exhibition-detail__events-body wysiwyg">
 				<?php echo wp_kses_post($events); ?>
 			</div>
 			<?php if ($events_table) : ?>
 			<div class="exhibition-detail__event-detail">
-				<?php if ($events_table['title']) : ?>
+				<?php if (!empty($events_table['title'])) : ?>
 				<p class="exhibition-detail__event-subtitle"><?php echo esc_html($events_table['title']); ?></p>
 				<?php endif; ?>
 				<ul class="exhibition-detail__event-list">
-					<?php foreach ($events_table['table'] as $item) : ?>
+					<?php
+					$pairs = [
+						'period' => '会期',
+						'place' => '会場',
+						'hours' => '時間',
+						'address' => '住所',
+						'price' => '入場',
+					];
+					?>
+					<?php foreach ($pairs as $key => $label) : ?>
+						<?php if (!empty($events_table[$key])) : ?>
 					<li class="exhibition-detail__event-item">
-						<span class="exhibition-detail__event-label"><?php echo esc_html($item['term']); ?></span>
-						<span class="exhibition-detail__event-value"><?php echo esc_html($item['description']); ?></span>
+						<span class="exhibition-detail__event-label"><?php echo esc_html($label); ?></span>
+						<span class="exhibition-detail__event-value"><?php echo esc_html($events_table[$key]); ?></span>
 					</li>
+						<?php endif; ?>
 					<?php endforeach; ?>
 				</ul>
 			</div>
