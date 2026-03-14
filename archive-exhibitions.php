@@ -103,7 +103,7 @@
 			$ft_mv_image = (!empty($ft_mv['image'])) ? $ft_mv['image'] : null;
 			$ft_subtitle = get_field('subtitle', $ft_id);
 			$ft_overview_table = get_field('overview_table', $ft_id);
-			$ft_period = (!empty($ft_overview_table['period'])) ? $ft_overview_table['period'] : '';
+			$ft_period = (!empty(get_field('period', $ft_id))) ? get_field('period', $ft_id) : '';
 			$ft_description = get_field('description', $ft_id);
 
 			// アーティスト名を取得（複数の場合は「、」で連結）
@@ -159,7 +159,7 @@
 				$li_id = $list_post->ID;
 				$li_subtitle = get_field('subtitle', $li_id);
 				$li_overview_table = get_field('overview_table', $li_id);
-				$li_period = (!empty($li_overview_table['period'])) ? $li_overview_table['period'] : '';
+				$li_period = (!empty(get_field('period', $li_id))) ? get_field('period', $li_id) : '';
 
 				// アーティスト名
 				$li_artists_obj = get_field('artists', $li_id);
