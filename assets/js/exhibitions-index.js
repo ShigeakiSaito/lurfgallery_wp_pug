@@ -1,10 +1,32 @@
+// ===== URL パラメータ操作ヘルパー =====
+function updateUrlParam(key, value) {
+	var url = new URL(window.location.href);
+	if (value === 'all') {
+		url.searchParams.delete(key);
+	} else {
+		url.searchParams.set(key, value);
+	}
+	window.location.href = url.toString();
+}
+
+// ===== ステータスタブ =====
+(function () {
+	var tabs = document.querySelectorAll('.exhibitions-index__tab');
+	tabs.forEach(function (tab) {
+		tab.addEventListener('click', function () {
+			var status = tab.dataset.status;
+			updateUrlParam('status', status);
+		});
+	});
+})();
+
 // ===== Year Select ドロップダウン =====
 (function () {
-	const yearSelect = document.getElementById('js-year-select');
+	var yearSelect = document.getElementById('js-year-select');
 	if (!yearSelect) return;
 
-	const label = yearSelect.querySelector('.exhibitions-index__year-label');
-	const options = yearSelect.querySelectorAll('.exhibitions-index__year-option');
+	var label = yearSelect.querySelector('.exhibitions-index__year-label');
+	var options = yearSelect.querySelectorAll('.exhibitions-index__year-option');
 
 	yearSelect.addEventListener('click', function (e) {
 		e.stopPropagation();
@@ -22,6 +44,8 @@
 				label.textContent = year === 'all' ? 'SELECT YEAR' : year;
 			}
 			yearSelect.classList.remove('is-open');
+
+			updateUrlParam('ex_year', year);
 		});
 	});
 
