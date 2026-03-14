@@ -70,9 +70,9 @@
 
 		<!-- ===== Section 05: 展示概要 ===== -->
 		<?php $overview = get_field('overview'); ?>
-		<?php $overview_data = get_field('overview_data'); ?>
+		<?php $overview_table = get_field('overview_table'); ?>
 		<?php $overview_note = get_field('overview_note'); ?>
-		<?php if ($overview || $overview_data || $overview_note) : ?>
+		<?php if ($overview || $overview_table || $overview_note) : ?>
 		<section class="exhibition-detail__overview">
 			<?php if ($overview) : ?>
 			<h3 class="exhibition-detail__overview-title">展示概要</h3>
@@ -80,30 +80,28 @@
 			<?php echo wp_kses_post($overview); ?>
 			</div>
 			<?php endif; ?>
-			<?php if ($overview_data) : ?>
-				<?php if ($overview_data['title']) : ?>
-			<p class="exhibition-detail__overview-subtitle"><?php echo esc_html($overview_data['title']); ?></p>
+			<?php if ($overview_table) : ?>
+				<?php if ($overview_table['title']) : ?>
+			<p class="exhibition-detail__overview-subtitle"><?php echo esc_html($overview_table['title']); ?></p>
 				<?php endif; ?>
 			<ul class="exhibition-detail__overview-list">
-				<?php if (!empty($overview_table['period'])) : ?>
-					<?php
-					$pairs = [
-						'period' => '会期',
-						'place' => '会場',
-						'hours' => '時間',
-						'address' => '住所',
-						'price' => '入場',
-					];
-					?>
-					<?php foreach ($pairs as $key => $label) : ?>
-						<?php if (!empty($overview_table[$key])) : ?>
-					<li class="exhibition-detail__overview-item">
-						<span class="exhibition-detail__overview-label"><?php echo esc_html($label); ?></span>
-						<span class="exhibition-detail__overview-value"><?php echo esc_html($overview_table[$key]); ?></span>
-					</li>
-						<?php endif; ?>
-					<?php endforeach; ?>
-				<?php endif; ?>
+				<?php
+				$pairs = [
+					'period' => '会期',
+					'place' => '会場',
+					'hours' => '時間',
+					'address' => '住所',
+					'price' => '入場',
+				];
+				?>
+				<?php foreach ($pairs as $key => $label) : ?>
+					<?php if (!empty($overview_table[$key])) : ?>
+				<li class="exhibition-detail__overview-item">
+					<span class="exhibition-detail__overview-label"><?php echo esc_html($label); ?></span>
+					<span class="exhibition-detail__overview-value"><?php echo esc_html($overview_table[$key]); ?></span>
+				</li>
+					<?php endif; ?>
+				<?php endforeach; ?>
 			</ul>
 				<?php endif; ?>
 				<?php if ($overview_note) : ?>
