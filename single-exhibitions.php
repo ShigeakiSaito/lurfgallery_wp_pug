@@ -278,6 +278,24 @@
 					$bk_image = (!empty($bk_images[0]['image'])) ? $bk_images[0]['image'] : null;
 					$bk_artist = get_field('artist_name', $book->ID);
 					$bk_title = get_field('title', $book->ID);
+					$bk_release_date = get_field('release_date', $book->ID);
+					$bk_size = get_field('size', $book->ID);
+					$bk_page_num = get_field('page_num', $book->ID);
+					$bk_description = get_field('description', $book->ID);
+					$bk_note = get_field('note', $book->ID);
+					$bk_price = get_field('price', $book->ID);
+					// 説明文生成
+					$bk_artist = (!empty($bk_artist['is_display']) && !empty($bk_artist['value'])) ? $bk_artist['value'] : null;
+					$bk_title = (!empty($bk_title['is_display']) && !empty($bk_title['value'])) ? $bk_title['value'] : null;
+					$bk_release_date = (!empty($bk_release_date['is_display']) && !empty($bk_release_date['value'])) ? $bk_release_date['value'] : null;
+					$bk_size = (!empty($bk_size['is_display']) && !empty($bk_size['value'])) ? $bk_size['value'] : null;
+					$bk_page_num = (!empty($bk_page_num['is_display']) && !empty($bk_page_num['value'])) ? $bk_page_num['value'] : null;
+					$bk_description = (!empty($bk_description['is_display']) && !empty($bk_description['value'])) ? $bk_description['value'] : null;
+					$bk_note = (!empty($bk_note['is_display']) && !empty($bk_note['value'])) ? $bk_note['value'] : null;
+					$bk_price = (!empty($bk_price['is_display']) && !empty($bk_price['value'])) ? $bk_price['value'] : null;
+
+					$bk_spec_line1 = implode(', ', array_filter([$bk_title, $bk_release_date]));
+					$bk_spec_line2 = implode(', ', array_filter([$bk_size, $bk_page_num, $bk_description, $bk_note, $bk_price]));
 				?>
 				<a href="<?php echo esc_url(get_permalink($book->ID)); ?>" class="exhibition-detail__books-item">
 					<?php if ($bk_image) : ?>
@@ -286,11 +304,14 @@
 					</div>
 					<?php endif; ?>
 					<div class="exhibition-detail__books-info">
-						<?php if (!empty($bk_artist['value'])) : ?>
-						<p class="exhibition-detail__books-artist"><?php echo esc_html($bk_artist['value']); ?></p>
+						<?php if ($bk_artist) : ?>
+						<p class="exhibition-detail__books-artist"><?php echo esc_html($bk_artist); ?></p>
 						<?php endif; ?>
-						<?php if (!empty($bk_title['value'])) : ?>
-						<p class="exhibition-detail__books-spec"><?php echo esc_html($bk_title['value']); ?></p>
+						<?php if ($bk_spec_line1) : ?>
+						<p class="exhibition-detail__books-spec"><?php echo esc_html($bk_spec_line1); ?></p>
+						<?php endif; ?>
+						<?php if ($bk_spec_line2) : ?>
+						<p class="exhibition-detail__books-spec"><?php echo esc_html($bk_spec_line2); ?></p>
 						<?php endif; ?>
 					</div>
 				</a>
