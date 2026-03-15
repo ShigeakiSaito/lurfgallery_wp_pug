@@ -108,11 +108,13 @@ $artworks_initial_rows = 5; // PC版で表示する行数
 						<?php if ($contact1_url) : ?>
 						<a href="<?php echo esc_url($contact1_url); ?>" class="artist-detail__overview-contact">CONTACT</a>
 						<?php endif; ?>
-						<?php for ($i = 1; $i <= 3; $i++) :
-							$link = $overview["link{$i}"] ?? '';
-							if ($link) : ?>
-						<a href="<?php echo esc_url($link); ?>" class="artist-detail__overview-link" target="_blank" rel="noopener noreferrer"><?php echo esc_html($link); ?></a>
-						<?php endif; endfor; ?>
+						<div class="artist-detail__overview-links">
+							<?php for ($i = 1; $i <= 3; $i++) :
+								$link = $overview["link{$i}"] ?? '';
+								if ($link) : ?>
+							<a href="<?php echo esc_url($link); ?>" class="artist-detail__overview-link" target="_blank" rel="noopener noreferrer"><?php echo esc_html($link); ?></a>
+							<?php endif; endfor; ?>
+						</div>
 					</div>
 				</div>
 				<!-- テキスト・プロフィール -->
@@ -240,7 +242,7 @@ $artworks_initial_rows = 5; // PC版で表示する行数
 			<h3 class="artist-detail__section-heading artist-detail__section-heading--large">BIOGRAPHY</h3>
 			<?php $bio_text = $biography['text'] ?? ''; ?>
 			<?php if ($bio_text) : ?>
-			<div class="artist-detail__bio-text">
+			<div class="artist-detail__bio-text wysiwyg">
 				<?php echo wp_kses_post($bio_text); ?>
 			</div>
 			<?php endif; ?>
