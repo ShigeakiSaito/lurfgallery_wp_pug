@@ -44,6 +44,26 @@ function theme_enqueue_assets() {
 			true
 		);
 	}
+
+	if ( is_post_type_archive( 'exhibitions' ) ) {
+		wp_enqueue_script(
+			'exhibitions-index-script',
+			get_template_directory_uri() . '/assets/js/exhibitions-index.js',
+			['theme-script'],
+			filemtime( get_template_directory() . '/assets/js/exhibitions-index.js' ),
+			true
+		);
+	}
+
+	if ( is_post_type_archive( 'artfairs' ) ) {
+		wp_enqueue_script(
+			'artfairs-index-script',
+			get_template_directory_uri() . '/assets/js/artfairs-index.js',
+			['theme-script'],
+			filemtime( get_template_directory() . '/assets/js/artfairs-index.js' ),
+			true
+		);
+	}
 }
 add_action('wp_enqueue_scripts', 'theme_enqueue_assets');
 
@@ -63,6 +83,7 @@ function create_post_type() {
       'has_archive' => true,
       'menu_position' => 6,
 			'supports' => array('title', 'custom-fields'),
+			'taxonomies' => array('exhibition_status', 'exhibition_year'),
     )
 	);
 	// artworks
@@ -119,6 +140,7 @@ function create_post_type() {
 			'has_archive' => true,
 			'menu_position' => 6,
 			'supports' => array('title', 'custom-fields'),
+			'taxonomies' => array('exhibition_status', 'exhibition_year'),
 		)
 	);
 	// artists
@@ -152,6 +174,46 @@ function create_post_type() {
 				'add_new_item' => __( '新しいカテゴリを追加' ),
 				'new_item_name' => __( '新しいカテゴリ名' ),
 				'menu_name' => __( 'カテゴリ' ),
+			),
+			'hierarchical' => true,
+			'show_in_rest' => true,
+			'show_admin_column' => true,
+		)
+	);
+
+	// exhibitions / artfairs 共有タクソノミー: ステータス
+	register_taxonomy( 'exhibition_status', array('exhibitions', 'artfairs'),
+		array(
+			'labels' => array(
+				'name' => __( 'ステータス' ),
+				'singular_name' => __( 'ステータス' ),
+				'search_items' => __( 'ステータスを検索' ),
+				'all_items' => __( 'すべてのステータス' ),
+				'edit_item' => __( 'ステータスを編集' ),
+				'update_item' => __( 'ステータスを更新' ),
+				'add_new_item' => __( '新しいステータスを追加' ),
+				'new_item_name' => __( '新しいステータス名' ),
+				'menu_name' => __( 'ステータス' ),
+			),
+			'hierarchical' => true,
+			'show_in_rest' => true,
+			'show_admin_column' => true,
+		)
+	);
+
+	// exhibitions / artfairs 共有タクソノミー: 年度
+	register_taxonomy( 'exhibition_year', array('exhibitions', 'artfairs'),
+		array(
+			'labels' => array(
+				'name' => __( '年度' ),
+				'singular_name' => __( '年度' ),
+				'search_items' => __( '年度を検索' ),
+				'all_items' => __( 'すべての年度' ),
+				'edit_item' => __( '年度を編集' ),
+				'update_item' => __( '年度を更新' ),
+				'add_new_item' => __( '新しい年度を追加' ),
+				'new_item_name' => __( '新しい年度名' ),
+				'menu_name' => __( '年度' ),
 			),
 			'hierarchical' => true,
 			'show_in_rest' => true,

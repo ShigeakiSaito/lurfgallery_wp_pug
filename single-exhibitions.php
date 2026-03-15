@@ -76,7 +76,7 @@
 		<section class="exhibition-detail__overview">
 			<?php if ($overview) : ?>
 			<h3 class="exhibition-detail__overview-title">展示概要</h3>
-			<div class="exhibition-detail__overview-content">
+			<div class="exhibition-detail__overview-content wysiwyg">
 			<?php echo wp_kses_post($overview); ?>
 			</div>
 			<?php endif; ?>
@@ -85,35 +85,53 @@
 			<p class="exhibition-detail__overview-subtitle"><?php echo esc_html($overview_table['title']); ?></p>
 				<?php endif; ?>
 			<ul class="exhibition-detail__overview-list">
-				<?php foreach ($overview_table['table'] as $item) : ?>
-			<li class="exhibition-detail__overview-item">
-				<span class="exhibition-detail__overview-label"><?php echo esc_html($item['term']); ?></span>
-				<span class="exhibition-detail__overview-value"><?php echo esc_html($item['description']); ?></span>
-			</li>
+				<?php
+				$pairs = [
+					'period' => '会期',
+					'place' => '会場',
+					'hours' => '時間',
+					'address' => '住所',
+					'price' => '入場',
+				];
+				?>
+				<?php foreach ($pairs as $key => $label) : ?>
+					<?php if (!empty($overview_table[$key])) : ?>
+				<li class="exhibition-detail__overview-item">
+					<span class="exhibition-detail__overview-label"><?php echo esc_html($label); ?></span>
+					<span class="exhibition-detail__overview-value"><?php echo esc_html($overview_table[$key]); ?></span>
+				</li>
+					<?php endif; ?>
 				<?php endforeach; ?>
 			</ul>
-			<?php endif; ?>
-			<?php if ($overview_note) : ?>
+				<?php endif; ?>
+				<?php if ($overview_note) : ?>
 			<p><?php echo wp_kses_post($overview_note); ?></p>
 			<?php endif; ?>
 		</section>
 		<?php endif; ?>
 
 		<!-- ===== Section 06: ステートメント / 寄稿文 ===== -->
-		<?php $statement = get_field('statement'); ?>
-		<?php $contribution = get_field('contribution'); ?>
+		<?php $statement_contribution = get_field('statement_contribution'); ?>
+		<?php if ($statement_contribution) : ?>
+			<?php 
+				$statement = $statement_contribution['statement']; 
+				$contribution = $statement_contribution['contribution']; 
+				$line_num_pc = $statement_contribution['line_num_pc'] ?: 99;
+				$line_num_sp = $statement_contribution['line_num_sp'] ?: 99;
+			?>
+		<?php endif; ?>
 		<?php if ($statement || $contribution) : ?>
 		<section class="exhibition-detail__statement">
 			<?php if ($statement) : ?>
 			<div class="exhibition-detail__statement-upper">
 				<p class="exhibition-detail__statement-heading">Statement</p>
-				<div class="exhibition-detail__statement-body">
+				<div class="exhibition-detail__statement-body" style="--clamp-lines-pc: <?php echo (int)$line_num_pc; ?>; --clamp-lines-sp: <?php echo (int)$line_num_sp; ?>;">
 					<?php echo wp_kses_post($statement); ?>
 				</div>
 			</div>
 			<?php endif; ?>
 			<?php if ($contribution) : ?>
-			<div class="exhibition-detail__statement-lower">
+			<div class="exhibition-detail__statement-lower" style="--clamp-lines-pc: <?php echo (int)$line_num_pc; ?>; --clamp-lines-sp: <?php echo (int)$line_num_sp; ?>;">
 				<?php echo wp_kses_post($contribution); ?>
 			</div>
 			<?php endif; ?>
@@ -122,28 +140,39 @@
 
 		<!-- ===== Section 07: FEATURED WORKS ===== -->
 		<?php $featured_works = get_field('featured_works'); ?>
-		<?php if ($featured_works) : ?>
-		<?php
-		$col = get_field('featured_works_column');
-		$col = in_array($col, ['1', '2', '3']) ? $col : '3';
-		?>
+		<?php if (!empty($featured_works['set'])) : ?>
+		<?php $works_initial_rows = 1; ?>
 		<section class="exhibition-detail__works">
 			<h3 class="exhibition-detail__section-heading">Featured Works</h3>
-			<div class="exhibition-detail__works-grid">
-				<div class="exhibition-detail__works-row exhibition-detail__works-row--col<?php echo $col; ?>">
-					<?php
-					$visible_count = (int) $col * 5;
-					foreach ($featured_works as $index => $work) :
-						$work_images = get_field('images', $work->ID);
+			<div class="exhibition-detail__works-grid" id="js-works-grid">
+				<?php
+				$sets = $featured_works['set'];
+				foreach ($sets as $set) :
+					$columns = $set['columns'] ?? 'col3';
+					$works = $set['works'] ?? [];
+					if (empty($works)) continue;
+
+					// カラム数から初期表示件数を算出
+					$col_count = ($columns === 'col1') ? 1 : (($columns === 'col2') ? 2 : 3);
+					$initial_visible = $col_count * $works_initial_rows;
+				?>
+				<div class="exhibition-detail__works-row exhibition-detail__works-row--<?php echo esc_attr($columns); ?>"
+					data-col-count="<?php echo esc_attr($col_count); ?>"
+					data-initial-rows="<?php echo esc_attr($works_initial_rows); ?>">
+					<?php foreach ($works as $index => $work) :
+						$work_id = is_object($work) ? $work->ID : $work;
+						$work_images = get_field('images', $work_id);
 						$work_image = '';
 						if ($work_images && !empty($work_images[0]['image'])) {
 							$work_image = $work_images[0]['image'];
 						}
-						$work_artist = get_field('artist_name', $work->ID);
-						$work_title_field = get_field('title', $work->ID);
-						$is_hidden = $index >= $visible_count;
+						$work_artist = get_field('artist_name', $work_id);
+						$work_title_field = get_field('title', $work_id);
+
+						// 初期表示件数を超えたら is-hidden を付与
+						$hidden_class = ($index >= $initial_visible) ? ' is-hidden' : '';
 					?>
-					<a href="<?php echo esc_url(get_permalink($work->ID)); ?>" class="exhibition-detail__work<?php echo $is_hidden ? ' is-hidden' : ''; ?>">
+					<a href="<?php echo esc_url(get_permalink($work_id)); ?>" class="exhibition-detail__work<?php echo $hidden_class; ?>">
 						<?php if ($work_image) : ?>
 						<div class="exhibition-detail__work-img">
 							<img src="<?php echo esc_url($work_image['url']); ?>" alt="<?php echo esc_attr($work_image['alt']); ?>" loading="lazy">
@@ -160,23 +189,22 @@
 					</a>
 					<?php endforeach; ?>
 				</div>
+				<?php if (count($works) > $initial_visible) : ?>
+				<div class="exhibition-detail__works-more js-works-more">
+					<button type="button" class="u-button-more u-button-more--border">View more</button>
+				</div>
+				<?php endif; ?>
+				<?php endforeach; ?>
 			</div>
-
-			<?php if (count($featured_works) > $visible_count) : ?>
-			<!-- View more -->
-			<div class="exhibition-detail__works-more" id="js-exhibition-works-more">
-				<button type="button" class="u-button-more u-button-more--border">View more</button>
-			</div>
-			<?php endif; ?>
 		</section>
 		<?php endif; ?>
 
 		<!-- ===== Section 08: CONTACTボタン（セクション間） ===== -->
-		<?php $contact_url = get_field('contact_url'); ?>
-		<?php if ($contact_url) : ?>
+		<?php $contact2 = get_field('contact2'); ?>
+		<?php if ($contact2) : ?>
 		<div class="exhibition-detail__works-cta">
 			<p class="exhibition-detail__works-cta-text">販売作品リストをご希望の方は、お問い合わせよりご連絡ください</p>
-			<a href="<?php echo esc_url($contact_url); ?>" class="exhibition-detail__works-cta-button">CONTACT</a>
+			<a href="<?php echo home_url('contact/'); ?>" class="exhibition-detail__works-cta-button">CONTACT</a>
 		</div>
 		<?php endif; ?>
 
@@ -191,6 +219,28 @@
 					$ed_image = (!empty($ed_images[0]['image'])) ? $ed_images[0]['image'] : null;
 					$ed_artist = get_field('artist_name', $edition->ID);
 					$ed_title = get_field('title', $edition->ID);
+					$ed_year = get_field('year', $edition->ID);
+					$ed_material = get_field('material', $edition->ID);
+					$ed_edition = get_field('edition', $edition->ID);
+					$ed_sign = get_field('sign', $edition->ID);
+					$ed_frame = get_field('frame', $edition->ID);
+					$ed_size = get_field('size', $edition->ID);
+					$ed_description = get_field('description', $edition->ID);
+					$ed_note = get_field('note', $edition->ID);
+					// 説明文生成
+					$ed_artist = (!empty($ed_artist['is_display']) && !empty($ed_artist['value'])) ? $ed_artist['value'] : null;
+					$ed_title = (!empty($ed_title['is_display']) && !empty($ed_title['value'])) ? $ed_title['value'] : null;
+					$ed_year = (!empty($ed_year['is_display']) && !empty($ed_year['value'])) ? $ed_year['value'] : null;
+					$ed_material = (!empty($ed_material['is_display']) && !empty($ed_material['value'])) ? $ed_material['value'] : null;
+					$ed_edition = (!empty($ed_edition['is_display']) && !empty($ed_edition['value'])) ? $ed_edition['value'] : null;
+					$ed_sign = (!empty($ed_sign['is_display']) && !empty($ed_sign['value'])) ? $ed_sign['value'] : null;
+					$ed_frame = (!empty($ed_frame['is_display']) && !empty($ed_frame['value'])) ? $ed_frame['value'] : null;
+					$ed_size = (!empty($ed_size['is_display']) && !empty($ed_size['value'])) ? $ed_size['value'] : null;
+					$ed_description = (!empty($ed_description['is_display']) && !empty($ed_description['value'])) ? $ed_description['value'] : null;
+					$ed_note = (!empty($ed_note['is_display']) && !empty($ed_note['value'])) ? $ed_note['value'] : null;
+
+					$spec_line1 = implode(', ', array_filter([$ed_title, $ed_year, $ed_material]));
+					$spec_line2 = implode(', ', array_filter([$ed_edition, $ed_sign, $ed_frame, $ed_description, $ed_note]));
 				?>
 				<a href="<?php echo esc_url(get_permalink($edition->ID)); ?>" class="exhibition-detail__edition-item">
 					<?php if ($ed_image) : ?>
@@ -199,11 +249,14 @@
 					</div>
 					<?php endif; ?>
 					<div class="exhibition-detail__edition-info">
-						<?php if (!empty($ed_artist['value'])) : ?>
-						<p class="exhibition-detail__edition-artist"><?php echo esc_html($ed_artist['value']); ?></p>
+						<?php if (!empty($ed_artist)) : ?>
+						<p class="exhibition-detail__edition-artist"><?php echo esc_html($ed_artist); ?></p>
 						<?php endif; ?>
-						<?php if (!empty($ed_title['value'])) : ?>
-						<p class="exhibition-detail__edition-spec"><?php echo esc_html($ed_title['value']); ?></p>
+						<?php if ($spec_line1) : ?>
+						<p class="exhibition-detail__edition-spec"><?php echo esc_html($spec_line1); ?></p>
+						<?php endif; ?>
+						<?php if ($spec_line2) : ?>
+						<p class="exhibition-detail__edition-spec"><?php echo esc_html($spec_line2); ?></p>
 						<?php endif; ?>
 					</div>
 				</a>
@@ -223,6 +276,24 @@
 					$bk_image = (!empty($bk_images[0]['image'])) ? $bk_images[0]['image'] : null;
 					$bk_artist = get_field('artist_name', $book->ID);
 					$bk_title = get_field('title', $book->ID);
+					$bk_release_date = get_field('release_date', $book->ID);
+					$bk_size = get_field('size', $book->ID);
+					$bk_page_num = get_field('page_num', $book->ID);
+					$bk_description = get_field('description', $book->ID);
+					$bk_note = get_field('note', $book->ID);
+					$bk_price = get_field('price', $book->ID);
+					// 説明文生成
+					$bk_artist = (!empty($bk_artist['is_display']) && !empty($bk_artist['value'])) ? $bk_artist['value'] : null;
+					$bk_title = (!empty($bk_title['is_display']) && !empty($bk_title['value'])) ? $bk_title['value'] : null;
+					$bk_release_date = (!empty($bk_release_date['is_display']) && !empty($bk_release_date['value'])) ? $bk_release_date['value'] : null;
+					$bk_size = (!empty($bk_size['is_display']) && !empty($bk_size['value'])) ? $bk_size['value'] : null;
+					$bk_page_num = (!empty($bk_page_num['is_display']) && !empty($bk_page_num['value'])) ? $bk_page_num['value'] : null;
+					$bk_description = (!empty($bk_description['is_display']) && !empty($bk_description['value'])) ? $bk_description['value'] : null;
+					$bk_note = (!empty($bk_note['is_display']) && !empty($bk_note['value'])) ? $bk_note['value'] : null;
+					$bk_price = (!empty($bk_price['is_display']) && !empty($bk_price['value'])) ? $bk_price['value'] : null;
+
+					$bk_spec_line1 = implode(', ', array_filter([$bk_title, $bk_release_date]));
+					$bk_spec_line2 = implode(', ', array_filter([$bk_size, $bk_page_num, $bk_description, $bk_note, $bk_price]));
 				?>
 				<a href="<?php echo esc_url(get_permalink($book->ID)); ?>" class="exhibition-detail__books-item">
 					<?php if ($bk_image) : ?>
@@ -231,11 +302,14 @@
 					</div>
 					<?php endif; ?>
 					<div class="exhibition-detail__books-info">
-						<?php if (!empty($bk_artist['value'])) : ?>
-						<p class="exhibition-detail__books-artist"><?php echo esc_html($bk_artist['value']); ?></p>
+						<?php if ($bk_artist) : ?>
+						<p class="exhibition-detail__books-artist"><?php echo esc_html($bk_artist); ?></p>
 						<?php endif; ?>
-						<?php if (!empty($bk_title['value'])) : ?>
-						<p class="exhibition-detail__books-spec"><?php echo esc_html($bk_title['value']); ?></p>
+						<?php if ($bk_spec_line1) : ?>
+						<p class="exhibition-detail__books-spec"><?php echo esc_html($bk_spec_line1); ?></p>
+						<?php endif; ?>
+						<?php if ($bk_spec_line2) : ?>
+						<p class="exhibition-detail__books-spec"><?php echo esc_html($bk_spec_line2); ?></p>
 						<?php endif; ?>
 					</div>
 				</a>
@@ -251,20 +325,31 @@
 		<?php if ($events) : ?>
 		<section class="exhibition-detail__events">
 			<h3 class="exhibition-detail__section-heading">Events</h3>
-			<div class="exhibition-detail__events-body">
+			<div class="exhibition-detail__events-body wysiwyg">
 				<?php echo wp_kses_post($events); ?>
 			</div>
 			<?php if ($events_table) : ?>
 			<div class="exhibition-detail__event-detail">
-				<?php if ($events_table['title']) : ?>
+				<?php if (!empty($events_table['title'])) : ?>
 				<p class="exhibition-detail__event-subtitle"><?php echo esc_html($events_table['title']); ?></p>
 				<?php endif; ?>
 				<ul class="exhibition-detail__event-list">
-					<?php foreach ($events_table['table'] as $item) : ?>
+					<?php
+					$pairs = [
+						'period' => '会期',
+						'place' => '会場',
+						'hours' => '時間',
+						'address' => '住所',
+						'price' => '入場',
+					];
+					?>
+					<?php foreach ($pairs as $key => $label) : ?>
+						<?php if (!empty($events_table[$key])) : ?>
 					<li class="exhibition-detail__event-item">
-						<span class="exhibition-detail__event-label"><?php echo esc_html($item['term']); ?></span>
-						<span class="exhibition-detail__event-value"><?php echo esc_html($item['description']); ?></span>
+						<span class="exhibition-detail__event-label"><?php echo esc_html($label); ?></span>
+						<span class="exhibition-detail__event-value"><?php echo esc_html($events_table[$key]); ?></span>
 					</li>
+						<?php endif; ?>
 					<?php endforeach; ?>
 				</ul>
 			</div>
@@ -284,7 +369,10 @@
 				<?php foreach ($artists as $artist) :
 					$ar_mv = get_field('mv_images', $artist->ID);
 					$ar_image = (!empty($ar_mv['pc'])) ? $ar_mv['pc'] : null;
-					$ar_description = get_field('overview', $artist->ID)['profile'] ?? '';
+					$ar_overview = get_field('overview', $artist->ID);
+					$ar_name1 = $ar_overview['name1'] ?? get_the_title($artist->ID);
+					$ar_name2 = $ar_overview['name2'] ?? '';
+					$ar_description = $ar_overview['profile'] ?? '';
 				?>
 				<div class="exhibition-detail__artist-item">
 					<?php if ($ar_image) : ?>
@@ -293,7 +381,10 @@
 					</div>
 					<?php endif; ?>
 					<div class="exhibition-detail__artist-info">
-						<p class="exhibition-detail__artist-name"><?php echo esc_html(get_the_title($artist->ID)); ?></p>
+						<p class="exhibition-detail__artist-name"><?php echo esc_html($ar_name1); ?></p>
+						<?php if ($ar_name2) : ?>
+						<p class="exhibition-detail__artist-name-ja"><?php echo esc_html($ar_name2); ?></p>
+						<?php endif; ?>
 						<?php if ($ar_description) : ?>
 						<p class="exhibition-detail__artist-bio"><?php echo esc_html($ar_description); ?></p>
 						<?php endif; ?>
@@ -460,35 +551,29 @@
 
 		});
 
-	// ----- View more (FEATURED WORKS) -----
-	const worksList = document.querySelector('.exhibition-detail__works-grid');
-	const worksMoreWrap = document.getElementById('js-exhibition-works-more');
+	// ----- View more (FEATURED WORKS: row ごとに独立) -----
+	document.querySelectorAll('.js-works-more').forEach(moreWrap => {
+		const row = moreWrap.previousElementSibling;
+		if (!row || !row.classList.contains('exhibition-detail__works-row')) return;
 
-	if (worksList && worksMoreWrap) {
-		const worksBtn = worksMoreWrap.querySelector('.u-button-more');
+		const moreBtn = moreWrap.querySelector('.u-button-more');
+		const colCount = parseInt(row.dataset.colCount, 10) || 3;
 
-		const getShowCount = (item) => {
-			const row = item.closest('.exhibition-detail__works-row');
-			if (row?.classList.contains('exhibition-detail__works-row--col1')) return 1;
-			if (row?.classList.contains('exhibition-detail__works-row--col2')) return 2;
-			return 3;
-		};
-
-		const updateWorksMoreVisibility = () => {
-			const hiddenItems = worksList.querySelectorAll('.exhibition-detail__work.is-hidden');
+		const updateMoreVisibility = () => {
+			const hiddenItems = row.querySelectorAll('.exhibition-detail__work.is-hidden');
 			if (hiddenItems.length === 0) {
-				worksMoreWrap.style.display = 'none';
+				moreWrap.style.display = 'none';
 			}
 		};
 
-		updateWorksMoreVisibility();
+		updateMoreVisibility();
 
-		if (worksBtn) {
-			worksBtn.addEventListener('click', () => {
-				const hiddenItems = worksList.querySelectorAll('.exhibition-detail__work.is-hidden');
+		if (moreBtn) {
+			moreBtn.addEventListener('click', () => {
+				const hiddenItems = row.querySelectorAll('.exhibition-detail__work.is-hidden');
 				if (hiddenItems.length === 0) return;
 
-				const showCount = Math.min(getShowCount(hiddenItems[0]), hiddenItems.length);
+				const showCount = Math.min(colCount, hiddenItems.length);
 
 				for (let i = 0; i < showCount; i++) {
 					const item = hiddenItems[i];
@@ -500,10 +585,10 @@
 					}, { once: true });
 				}
 
-				updateWorksMoreVisibility();
+				updateMoreVisibility();
 			});
 		}
-	}
+	});
 	</script>
 
 <?php get_footer(); ?>
