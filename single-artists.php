@@ -303,7 +303,7 @@ $artworks_initial_rows = 5; // PC版で表示する行数
 						<?php foreach ($exhibitions as $exh) :
 						  // $exh はACFの投稿オブジェクト
 							$exh_id = is_object($exh) ? $exh->ID : $exh;
-							$exh_title = get_field('main_visual', $exh_id)['text1'] ?? get_the_title($exh_id); // タイトル
+							$exh_title = get_the_title($exh_id); // タイトル
 							$exh_subtitle = get_field('subtitle', $exh_id) ?? ''; // サブタイトル
 							$exh_images = get_field('main_visual', $exh_id); // 画像配列
 							$exh_image_url = '';
@@ -337,7 +337,7 @@ $artworks_initial_rows = 5; // PC版で表示する行数
 								<p class="artist-detail__exh-card-subtitle"><?php echo esc_html($exh_subtitle); ?></p>
 								<?php endif; ?>
 								<?php if ($exh_artist_period) : ?>
-								<p class="artist-detail__exh-card-period"><?php echo esc_html($exh_artist_period); ?></p>
+								<p class="artist-detail__exh-card-period"><?php echo nl2br(esc_html($exh_artist_period)); ?></p>
 								<?php endif; ?>
 							</a>
 						</div>
@@ -349,7 +349,6 @@ $artworks_initial_rows = 5; // PC版で表示する行数
 		<?php endif; ?>
 
 		<!-- ===== Section 07: ART FAIR ===== -->
-		<!-- TODO: カスタムフィールド実装後に動的化 -->
 		<?php if ($has_fairs) : ?>
 		<section class="artist-detail__section artist-detail__slider-section" id="fairs">
 			<div class="artist-detail__slider-header">
@@ -367,6 +366,30 @@ $artworks_initial_rows = 5; // PC版で表示する行数
 			<div class="artist-detail__slider-body">
 				<div class="swiper js-artist-fair-swiper" id="artistFairSwiper">
 					<div class="swiper-wrapper">
+						<?php foreach ($artfairs as $fair) :
+							$fair_id = is_object($fair) ? $fair->ID : $fair;
+							$fair_title = get_the_title($fair_id);
+							$fair_mv = get_field('main_visual', $fair_id);
+							$fair_image_url = '';
+							$fair_image_alt = '';
+							if ($fair_mv && !empty($fair_mv['image'])) {
+								$fair_image_url = esc_url($fair_mv['image']['url']);
+								$fair_image_alt = esc_attr($fair_mv['image']['alt'] ?? '');
+							}
+							$fair_period = get_field('period', $fair_id);
+						?>
+						<div class="swiper-slide">
+							<a href="<?php echo get_permalink($fair_id); ?>" class="artist-detail__exh-card">
+								<div class="artist-detail__exh-card-img">
+									<img src="<?php echo $fair_image_url; ?>" alt="<?php echo $fair_image_alt; ?>" loading="lazy">
+								</div>
+								<p class="artist-detail__exh-card-artist"><?php echo esc_html($fair_title); ?></p>
+								<?php if ($fair_period) : ?>
+								<p class="artist-detail__exh-card-period"><?php echo nl2br(esc_html($fair_period)); ?></p>
+								<?php endif; ?>
+							</a>
+						</div>
+						<?php endforeach; ?>
 					</div>
 				</div>
 			</div>
