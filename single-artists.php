@@ -304,7 +304,7 @@ $artworks_initial_rows = 5; // PC版で表示する行数
 						  // $exh はACFの投稿オブジェクト
 							$exh_id = is_object($exh) ? $exh->ID : $exh;
 							$exh_title = get_field('main_visual', $exh_id)['text1'] ?? get_the_title($exh_id); // タイトル
-							$exh_subtitle = get_field('main_visual', $exh_id)['text2'] ?? ''; // サブタイトル
+							$exh_subtitle = get_field('subtitle', $exh_id) ?? ''; // サブタイトル
 							$exh_images = get_field('main_visual', $exh_id); // 画像配列
 							$exh_image_url = '';
 							$exh_image_alt = '';
@@ -315,6 +315,7 @@ $artworks_initial_rows = 5; // PC版で表示する行数
 							}
 							$exh_artists = get_field('artists', $exh_id); // アーティスト名配列
 							$exh_artist_text = '';
+							$exh_artist_period = get_field('period', $exh_id); // 会期
 							if ($exh_artists && is_array($exh_artists)) {
 								$artist_names = [];
 								foreach ($exh_artists as $artist) {
@@ -335,7 +336,9 @@ $artworks_initial_rows = 5; // PC版で表示する行数
 								<?php if ($exh_subtitle) : ?>
 								<p class="artist-detail__exh-card-subtitle"><?php echo esc_html($exh_subtitle); ?></p>
 								<?php endif; ?>
-								<p class="artist-detail__exh-card-period">会期</p>
+								<?php if ($exh_artist_period) : ?>
+								<p class="artist-detail__exh-card-period"><?php echo esc_html($exh_artist_period); ?></p>
+								<?php endif; ?>
 							</a>
 						</div>
 						<?php endforeach; ?>
