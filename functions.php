@@ -54,6 +54,16 @@ function theme_enqueue_assets() {
 			true
 		);
 	}
+
+	if ( is_post_type_archive( 'artfairs' ) ) {
+		wp_enqueue_script(
+			'artfairs-index-script',
+			get_template_directory_uri() . '/assets/js/artfairs-index.js',
+			['theme-script'],
+			filemtime( get_template_directory() . '/assets/js/artfairs-index.js' ),
+			true
+		);
+	}
 }
 add_action('wp_enqueue_scripts', 'theme_enqueue_assets');
 
