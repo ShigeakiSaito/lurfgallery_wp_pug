@@ -155,6 +155,29 @@ function create_post_type() {
 			'has_archive' => true,
 			'menu_position' => 6,
 			'supports' => array('title', 'custom-fields'),
+			'taxonomies' => array('artist_category'),
+		)
+	);
+
+	// artists カテゴリ
+	register_taxonomy( 'artist_category', 'artists',
+		array(
+			'labels' => array(
+				'name' => __( 'カテゴリ' ),
+				'singular_name' => __( 'カテゴリ' ),
+				'search_items' => __( 'カテゴリを検索' ),
+				'all_items' => __( 'すべてのカテゴリ' ),
+				'parent_item' => __( '親カテゴリ' ),
+				'parent_item_colon' => __( '親カテゴリ:' ),
+				'edit_item' => __( 'カテゴリを編集' ),
+				'update_item' => __( 'カテゴリを更新' ),
+				'add_new_item' => __( '新しいカテゴリを追加' ),
+				'new_item_name' => __( '新しいカテゴリ名' ),
+				'menu_name' => __( 'カテゴリ' ),
+			),
+			'hierarchical' => true,
+			'show_in_rest' => true,
+			'show_admin_column' => true,
 		)
 	);
 
