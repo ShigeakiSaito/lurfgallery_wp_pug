@@ -85,20 +85,12 @@
 			<p class="exhibition-detail__overview-subtitle"><?php echo esc_html($overview_table['title']); ?></p>
 				<?php endif; ?>
 			<ul class="exhibition-detail__overview-list">
-				<?php
-				$pairs = [
-					'period' => '会期',
-					'place' => '会場',
-					'hours' => '時間',
-					'address' => '住所',
-					'price' => '入場',
-				];
-				?>
-				<?php foreach ($pairs as $key => $label) : ?>
-					<?php if (!empty($overview_table[$key])) : ?>
+				<?php $pairs = $overview_table['rows']; ?>
+				<?php foreach ($pairs as $pair) : ?>
+					<?php if (!empty($pair['desc'])) : ?>
 				<li class="exhibition-detail__overview-item">
-					<span class="exhibition-detail__overview-label"><?php echo esc_html($label); ?></span>
-					<span class="exhibition-detail__overview-value"><?php echo esc_html($overview_table[$key]); ?></span>
+					<span class="exhibition-detail__overview-label"><?php echo esc_html($pair['term']); ?></span>
+					<span class="exhibition-detail__overview-value"><?php echo nl2br(esc_html($pair['desc'])); ?></span>
 				</li>
 					<?php endif; ?>
 				<?php endforeach; ?>
@@ -334,20 +326,12 @@
 				<p class="exhibition-detail__event-subtitle"><?php echo esc_html($events_table['title']); ?></p>
 				<?php endif; ?>
 				<ul class="exhibition-detail__event-list">
-					<?php
-					$pairs = [
-						'period' => '会期',
-						'place' => '会場',
-						'hours' => '時間',
-						'address' => '住所',
-						'price' => '入場',
-					];
-					?>
-					<?php foreach ($pairs as $key => $label) : ?>
-						<?php if (!empty($events_table[$key])) : ?>
+					<?php	$pairs = $events_table['rows'];	?>
+					<?php foreach ($pairs as $pair) : ?>
+						<?php if (!empty($pair['desc'])) : ?>
 					<li class="exhibition-detail__event-item">
-						<span class="exhibition-detail__event-label"><?php echo esc_html($label); ?></span>
-						<span class="exhibition-detail__event-value"><?php echo esc_html($events_table[$key]); ?></span>
+						<span class="exhibition-detail__event-label"><?php echo esc_html($pair['term']); ?></span>
+						<span class="exhibition-detail__event-value"><?php echo nl2br(esc_html($pair['desc'])); ?></span>
 					</li>
 						<?php endif; ?>
 					<?php endforeach; ?>
