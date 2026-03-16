@@ -160,6 +160,20 @@
 						}
 						$work_artist = get_field('artist_name', $work_id);
 						$work_title_field = get_field('title', $work_id);
+						$work_year = get_field('year', $work_id);
+						$work_material = get_field('material', $work_id);
+						$work_size = get_field('size', $work_id);
+						$work_description = get_field('description', $work_id);
+						$work_note = get_field('note', $work_id);
+
+						$work_title_field = (!empty($work_title_field['is_display_index']) && !empty($work_title_field['value'])) ? $work_title_field['value'] : null;
+						$work_year = (!empty($work_year['is_display_index']) && !empty($work_year['value'])) ? $work_year['value'] : null;
+						$work_material = (!empty($work_material['is_display_index']) && !empty($work_material['value'])) ? $work_material['value'] : null;
+						$work_size = (!empty($work_size['is_display_index']) && !empty($work_size['value'])) ? $work_size['value'] : null;
+						$work_description = (!empty($work_description['is_display_index']) && !empty($work_description['value'])) ? $work_description['value'] : null;
+						$work_note = (!empty($work_note['is_display_index']) && !empty($work_note['value'])) ? $work_note['value'] : null;
+
+						$work_spec_line = implode(', ', array_filter([$work_year, $work_material, $work_size, $work_description, $work_note]));
 
 						// 初期表示件数を超えたら is-hidden を付与
 						$hidden_class = ($index >= $initial_visible) ? ' is-hidden' : '';
@@ -174,8 +188,8 @@
 							<?php if (!empty($work_artist['value'])) : ?>
 							<p class="exhibition-detail__work-artist"><?php echo esc_html($work_artist['value']); ?></p>
 							<?php endif; ?>
-							<?php if (!empty($work_title_field['value'])) : ?>
-							<p class="exhibition-detail__work-spec"><?php echo esc_html($work_title_field['value']); ?></p>
+							<?php if (!empty($work_spec_line)) : ?>
+							<p class="exhibition-detail__work-spec"><?php echo esc_html($work_spec_line); ?></p>
 							<?php endif; ?>
 						</div>
 					</a>
@@ -220,19 +234,18 @@
 					$ed_description = get_field('description', $edition->ID);
 					$ed_note = get_field('note', $edition->ID);
 					// 説明文生成
-					$ed_artist = (!empty($ed_artist['is_display']) && !empty($ed_artist['value'])) ? $ed_artist['value'] : null;
-					$ed_title = (!empty($ed_title['is_display']) && !empty($ed_title['value'])) ? $ed_title['value'] : null;
-					$ed_year = (!empty($ed_year['is_display']) && !empty($ed_year['value'])) ? $ed_year['value'] : null;
-					$ed_material = (!empty($ed_material['is_display']) && !empty($ed_material['value'])) ? $ed_material['value'] : null;
-					$ed_edition = (!empty($ed_edition['is_display']) && !empty($ed_edition['value'])) ? $ed_edition['value'] : null;
-					$ed_sign = (!empty($ed_sign['is_display']) && !empty($ed_sign['value'])) ? $ed_sign['value'] : null;
-					$ed_frame = (!empty($ed_frame['is_display']) && !empty($ed_frame['value'])) ? $ed_frame['value'] : null;
-					$ed_size = (!empty($ed_size['is_display']) && !empty($ed_size['value'])) ? $ed_size['value'] : null;
-					$ed_description = (!empty($ed_description['is_display']) && !empty($ed_description['value'])) ? $ed_description['value'] : null;
-					$ed_note = (!empty($ed_note['is_display']) && !empty($ed_note['value'])) ? $ed_note['value'] : null;
+					$ed_artist = (!empty($ed_artist['is_display_index']) && !empty($ed_artist['value'])) ? $ed_artist['value'] : null;
+					$ed_title = (!empty($ed_title['is_display_index']) && !empty($ed_title['value'])) ? $ed_title['value'] : null;
+					$ed_year = (!empty($ed_year['is_display_index']) && !empty($ed_year['value'])) ? $ed_year['value'] : null;
+					$ed_material = (!empty($ed_material['is_display_index']) && !empty($ed_material['value'])) ? $ed_material['value'] : null;
+					$ed_edition = (!empty($ed_edition['is_display_index']) && !empty($ed_edition['value'])) ? $ed_edition['value'] : null;
+					$ed_sign = (!empty($ed_sign['is_display_index']) && !empty($ed_sign['value'])) ? $ed_sign['value'] : null;
+					$ed_frame = (!empty($ed_frame['is_display_index']) && !empty($ed_frame['value'])) ? $ed_frame['value'] : null;
+					$ed_size = (!empty($ed_size['is_display_index']) && !empty($ed_size['value'])) ? $ed_size['value'] : null;
+					$ed_description = (!empty($ed_description['is_display_index']) && !empty($ed_description['value'])) ? $ed_description['value'] : null;
+					$ed_note = (!empty($ed_note['is_display_index']) && !empty($ed_note['value'])) ? $ed_note['value'] : null;
 
-					$spec_line1 = implode(', ', array_filter([$ed_title, $ed_year, $ed_material]));
-					$spec_line2 = implode(', ', array_filter([$ed_edition, $ed_sign, $ed_frame, $ed_description, $ed_note]));
+					$spec_line = implode(', ', array_filter([$ed_artist, $ed_title, $ed_year, $ed_material, $ed_edition, $ed_sign, $ed_frame, $ed_description, $ed_note]));
 				?>
 				<a href="<?php echo esc_url(get_permalink($edition->ID)); ?>" class="exhibition-detail__edition-item">
 					<?php if ($ed_image) : ?>
@@ -244,11 +257,8 @@
 						<?php if (!empty($ed_artist)) : ?>
 						<p class="exhibition-detail__edition-artist"><?php echo esc_html($ed_artist); ?></p>
 						<?php endif; ?>
-						<?php if ($spec_line1) : ?>
-						<p class="exhibition-detail__edition-spec"><?php echo esc_html($spec_line1); ?></p>
-						<?php endif; ?>
-						<?php if ($spec_line2) : ?>
-						<p class="exhibition-detail__edition-spec"><?php echo esc_html($spec_line2); ?></p>
+						<?php if ($spec_line) : ?>
+						<p class="exhibition-detail__edition-spec"><?php echo esc_html($spec_line); ?></p>
 						<?php endif; ?>
 					</div>
 				</a>
@@ -275,17 +285,16 @@
 					$bk_note = get_field('note', $book->ID);
 					$bk_price = get_field('price', $book->ID);
 					// 説明文生成
-					$bk_artist = (!empty($bk_artist['is_display']) && !empty($bk_artist['value'])) ? $bk_artist['value'] : null;
-					$bk_title = (!empty($bk_title['is_display']) && !empty($bk_title['value'])) ? $bk_title['value'] : null;
-					$bk_release_date = (!empty($bk_release_date['is_display']) && !empty($bk_release_date['value'])) ? $bk_release_date['value'] : null;
-					$bk_size = (!empty($bk_size['is_display']) && !empty($bk_size['value'])) ? $bk_size['value'] : null;
-					$bk_page_num = (!empty($bk_page_num['is_display']) && !empty($bk_page_num['value'])) ? $bk_page_num['value'] : null;
-					$bk_description = (!empty($bk_description['is_display']) && !empty($bk_description['value'])) ? $bk_description['value'] : null;
-					$bk_note = (!empty($bk_note['is_display']) && !empty($bk_note['value'])) ? $bk_note['value'] : null;
-					$bk_price = (!empty($bk_price['is_display']) && !empty($bk_price['value'])) ? $bk_price['value'] : null;
+					$bk_artist = (!empty($bk_artist['is_display_index']) && !empty($bk_artist['value'])) ? $bk_artist['value'] : null;
+					$bk_title = (!empty($bk_title['is_display_index']) && !empty($bk_title['value'])) ? $bk_title['value'] : null;
+					$bk_release_date = (!empty($bk_release_date['is_display_index']) && !empty($bk_release_date['value'])) ? $bk_release_date['value'] : null;
+					$bk_size = (!empty($bk_size['is_display_index']) && !empty($bk_size['value'])) ? $bk_size['value'] : null;
+					$bk_page_num = (!empty($bk_page_num['is_display_index']) && !empty($bk_page_num['value'])) ? $bk_page_num['value'] : null;
+					$bk_description = (!empty($bk_description['is_display_index']) && !empty($bk_description['value'])) ? $bk_description['value'] : null;
+					$bk_note = (!empty($bk_note['is_display_index']) && !empty($bk_note['value'])) ? $bk_note['value'] : null;
+					$bk_price = (!empty($bk_price['is_display_index']) && !empty($bk_price['value'])) ? $bk_price['value'] : null;
 
-					$bk_spec_line1 = implode(', ', array_filter([$bk_title, $bk_release_date]));
-					$bk_spec_line2 = implode(', ', array_filter([$bk_size, $bk_page_num, $bk_description, $bk_note, $bk_price]));
+					$bk_spec_line = implode(', ', array_filter([$bk_title, $bk_release_date, $bk_size, $bk_page_num, $bk_description, $bk_note, $bk_price]));
 				?>
 				<a href="<?php echo esc_url(get_permalink($book->ID)); ?>" class="exhibition-detail__books-item">
 					<?php if ($bk_image) : ?>
@@ -297,11 +306,8 @@
 						<?php if ($bk_artist) : ?>
 						<p class="exhibition-detail__books-artist"><?php echo esc_html($bk_artist); ?></p>
 						<?php endif; ?>
-						<?php if ($bk_spec_line1) : ?>
-						<p class="exhibition-detail__books-spec"><?php echo esc_html($bk_spec_line1); ?></p>
-						<?php endif; ?>
-						<?php if ($bk_spec_line2) : ?>
-						<p class="exhibition-detail__books-spec"><?php echo esc_html($bk_spec_line2); ?></p>
+						<?php if ($bk_spec_line) : ?>
+						<p class="exhibition-detail__books-spec"><?php echo esc_html($bk_spec_line); ?></p>
 						<?php endif; ?>
 					</div>
 				</a>
