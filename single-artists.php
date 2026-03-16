@@ -94,11 +94,19 @@ $artworks_initial_rows = 5; // PC版で表示する行数
 						<?php
 						$image1 = $overview['image1'] ?? null;
 						$image1_display = $image1['display'] ?? '';
-						$image1_id = $image1['image'] ?? null;
-						$image1_url = $image1_id ? wp_get_attachment_image_url($image1_id, 'medium_large') : '';
-						$image1_alt = $image1_id ? get_post_meta($image1_id, '_wp_attachment_image_alt', true) : '';
-						if ($image1_display === 'detail' && $image1_url) : ?>
-						<img src="<?php echo esc_url($image1_url); ?>" alt="<?php echo esc_attr($image1_alt); ?>" width="386" height="386" loading="lazy">
+						$image2 = $overview['image2'] ?? null;
+						$image2_display = $image2['display'] ?? '';
+						if ($image1_display === 'detail') {
+							$image = $image1['image'] ?? null;
+						} elseif ($image2_display === 'detail') {
+							$image = $image2['image'] ?? null;
+						} else {
+							$image = $image1['image'] ?? null;
+						}
+						$image_url = $image['url'] ?? '';
+						$image_alt = $image['alt'] ?? '';
+						if ($image_url) : ?>
+						<img src="<?php echo esc_url($image_url); ?>" alt="<?php echo esc_attr($image_alt); ?>" width="386" height="386" loading="lazy">
 						<?php else : ?>
 						<img src="<?php echo $noimage; ?>" alt="" width="386" height="386" loading="lazy">
 						<?php endif; ?>
