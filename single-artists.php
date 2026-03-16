@@ -119,8 +119,11 @@ $artworks_initial_rows = 5; // PC版で表示する行数
 						<div class="artist-detail__overview-links">
 							<?php for ($i = 1; $i <= 3; $i++) :
 								$link = $overview["link{$i}"] ?? '';
-								if ($link) : ?>
-							<a href="<?php echo esc_url($link); ?>" class="artist-detail__overview-link" target="_blank" rel="noopener noreferrer"><?php echo esc_html($link); ?></a>
+								if ($link['url']) : 
+									$link_url = $link['url'] ?? '';
+									$link_text = $link['text'] ? $link['text'] : $link_url;
+								?>
+							<a href="<?php echo esc_url($link_url); ?>" class="artist-detail__overview-link" target="_blank" rel="noopener noreferrer"><?php echo esc_html($link_text); ?></a>
 							<?php endif; endfor; ?>
 						</div>
 					</div>
@@ -190,17 +193,18 @@ $artworks_initial_rows = 5; // PC版で表示する行数
 						$artwork_year = get_field('year', $artwork_id);
 						$artwork_material = get_field('material', $artwork_id);
 						$artwork_size = get_field('size', $artwork_id);
+						$artwork_description = get_field('description', $artwork_id);
+						$artwork_note = get_field('note', $artwork_id);
 
-						$artist_text = (!empty($artwork_artist['is_display']) && !empty($artwork_artist['value'])) ? $artwork_artist['value'] : '';
-						$title_text = (!empty($artwork_title['is_display']) && !empty($artwork_title['value'])) ? $artwork_title['value'] : '';
+						$artwork_title = (!empty($artwork_title['is_display_index']) && !empty($artwork_title['value'])) ? $artwork_title['value'] : '';
+						$artwork_year = (!empty($artwork_year['is_display_index']) && !empty($artwork_year['value'])) ? $artwork_year['value'] : '';
+						$artwork_material = (!empty($artwork_material['is_display_index']) && !empty($artwork_material['value'])) ? $artwork_material['value'] : '';
+						$artwork_size = (!empty($artwork_size['is_display_index']) && !empty($artwork_size['value'])) ? $artwork_size['value'] : '';
+						$artwork_description = (!empty($artwork_description['is_display_index']) && !empty($artwork_description['value'])) ? $artwork_description['value'] : '';
+						$artwork_note = (!empty($artwork_note['is_display_index']) && !empty($artwork_note['value'])) ? $artwork_note['value'] : '';
 
-						$spec_parts = [];
-						foreach ([$artwork_year, $artwork_material, $artwork_size] as $spec) {
-							if (!empty($spec['is_display']) && !empty($spec['value'])) {
-								$spec_parts[] = $spec['value'];
-							}
-						}
-						$spec_text = implode(', ', $spec_parts);
+						$artist_text = $artwork_artist['value'] ?? '';
+						$spec_text = implode(', ', array_filter([$artwork_title, $artwork_year, $artwork_material, $artwork_size, $artwork_description, $artwork_note]));
 
 						// 初期表示件数を超えたら is-hidden を付与
 						$hidden_class = ($index >= $initial_visible) ? ' is-hidden' : '';
@@ -216,9 +220,6 @@ $artworks_initial_rows = 5; // PC版で表示する行数
 						<div class="artist-detail__artwork-info">
 							<?php if ($artist_text) : ?>
 							<p class="artist-detail__artwork-artist"><?php echo esc_html($artist_text); ?></p>
-							<?php endif; ?>
-							<?php if ($title_text) : ?>
-							<p class="artist-detail__artwork-title"><?php echo esc_html($title_text); ?></p>
 							<?php endif; ?>
 							<?php if ($spec_text) : ?>
 							<p class="artist-detail__artwork-spec"><?php echo esc_html($spec_text); ?></p>
