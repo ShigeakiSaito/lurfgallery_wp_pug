@@ -100,8 +100,12 @@
 		$featured_index = 0;
 		foreach ($featured_posts as $ft_post) :
 			$ft_id = $ft_post->ID;
+			$ft_thumbnail = get_field('thumbnail', $ft_id);
 			$ft_mv = get_field('main_visual', $ft_id);
 			$ft_mv_image = (!empty($ft_mv['image'])) ? $ft_mv['image'] : null;
+			if (!$ft_thumbnail) {
+				$ft_thumbnail = $ft_mv_image; // サムネイルがない場合はメインビジュアルを使用
+			}
 			$ft_subtitle = get_field('subtitle', $ft_id);
 			$ft_overview_table = get_field('overview_table', $ft_id);
 			$ft_period = (!empty(get_field('period', $ft_id))) ? get_field('period', $ft_id) : '';
@@ -123,9 +127,9 @@
 			$featured_index++;
 		?>
 		<section class="exhibitions-index__featured<?php echo $reverse_class; ?>">
-			<?php if ($ft_mv_image) : ?>
+			<?php if ($ft_thumbnail) : ?>
 			<picture class="exhibitions-index__featured-img">
-				<img src="<?php echo esc_url($ft_mv_image['url']); ?>" alt="<?php echo esc_attr($ft_mv_image['alt']); ?>" width="772" height="514" loading="eager">
+				<img src="<?php echo esc_url($ft_thumbnail['url']); ?>" alt="<?php echo esc_attr($ft_thumbnail['alt']); ?>" width="772" height="514" loading="eager">
 			</picture>
 			<?php endif; ?>
 			<div class="exhibitions-index__featured-text">
