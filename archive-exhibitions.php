@@ -78,8 +78,9 @@
 		$list_posts = [];
 
 		foreach ($exhibitions as $ex) {
-			$ex_statuses = wp_get_post_terms($ex->ID, 'exhibition_status', array('fields' => 'slugs'));
-			if ($current_status === 'past' || in_array('past', $ex_statuses, true)) {
+			$ex_image = get_field('main_visual', $ex->ID)['image'] ?? null;
+			$ex_no_image = get_field('no_display_image', $ex->ID) ?? false;
+			if (!$ex_image || $ex_no_image) { // メインビジュアルがない、または「画像非表示」がtrueの場合はリスト表示
 				$list_posts[] = $ex;
 			} else {
 				$featured_posts[] = $ex;
