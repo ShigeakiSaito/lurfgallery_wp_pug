@@ -36,12 +36,12 @@
 				<!-- テキストエリア -->
 				<div class="edition-detail__info">
 					<?php $artist_name = get_field('artist_name'); ?>
-					<?php if (!empty($artist_name['is_display']) && !empty($artist_name['value'])) : ?>
+					<?php if (!empty($artist_name['is_display_detail']) && !empty($artist_name['value'])) : ?>
 					<h2 class="edition-detail__artist"><?php echo esc_html($artist_name['value']); ?></h2>
 					<?php endif; ?>
 
 					<?php $title = get_field('title'); ?>
-					<?php if (!empty($title['is_display']) && !empty($title['value'])) : ?>
+					<?php if (!empty($title['is_display_detail']) && !empty($title['value'])) : ?>
 					<h3 class="edition-detail__title"><?php echo esc_html($title['value']); ?></h3>
 					<?php endif; ?>
 
@@ -58,20 +58,20 @@
 							];
 							foreach ($spec_fields as $field_name) :
 								$field = get_field($field_name);
-								if (!empty($field['is_display']) && !empty($field['value'])) :
+								if (!empty($field['is_display_detail']) && !empty($field['value'])) :
 							?>
 							<p><?php echo esc_html($field['value']); ?></p>
 							<?php endif; endforeach; ?>
 						</div>
 						<?php $description = get_field('description'); ?>
-						<?php if (!empty($description['is_display']) && !empty($description['value'])) : ?>
+						<?php if (!empty($description['is_display_detail']) && !empty($description['value'])) : ?>
 						<p class="edition-detail__description">
 							<?php echo esc_html($description['value']); ?>
 						</p>
 						<?php endif; ?>
 					</div>
 					<?php $note = get_field('note'); ?>
-					<?php if (!empty($note['is_display']) && !empty($note['value'])) : ?>
+					<?php if (!empty($note['is_display_detail']) && !empty($note['value'])) : ?>
 					<div class="edition-detail__text">
 						<p><?php echo esc_html($note['value']); ?></p>
 					</div>
