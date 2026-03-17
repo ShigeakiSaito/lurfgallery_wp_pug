@@ -121,7 +121,7 @@
 					$ft_artist_names[] = $ar_overview['name2'] ?? get_the_title($ar_id);
 				}
 			}
-			$ft_artist_text = implode('、', $ft_artist_names);
+			$ft_artist_text = implode('／', $ft_artist_names);
 
 			$reverse_class = ($featured_index % 2 === 1) ? ' exhibitions-index__featured--reverse' : '';
 			$featured_index++;
@@ -176,7 +176,7 @@
 						$li_artist_names[] = $ar_overview['name2'] ?? get_the_title($ar_id);
 					}
 				}
-				$li_artist_text = implode('、', $li_artist_names);
+				$li_artist_text = implode('／', $li_artist_names);
 
 				$hidden_class = ($list_index >= $initial_visible) ? ' is-hidden' : '';
 				$list_index++;
