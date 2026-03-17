@@ -48,16 +48,16 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <div class="header__menu js-menu">
         <nav class="header__nav">
             <ul class="header__list">
-                <li><a href="">EXHIBITIONS</a></li>
-                <li><a href="">ARTISTS</a></li>
-                <li><a href="">ART FAIRS</a></li>
-                <li><a href="">NEWS</a></li>
+                <li><a href="<?php echo esc_url(home_url('/exhibitions/')); ?>">EXHIBITIONS</a></li>
+                <li><a href="<?php echo esc_url(home_url('/artists/')); ?>">ARTISTS</a></li>
+                <li><a href="<?php echo esc_url(home_url('/artfairs/')); ?>">ART FAIRS</a></li>
+                <li><a href="<?php echo esc_url(home_url('/news/')); ?>">NEWS</a></li>
             </ul>
             <ul class="header__sublist">
-                <li><a href="">ABOUT</a></li>
-                <li><a href="">CONTACT</a></li>
+                <li><a href="<?php echo esc_url(home_url('/about/')); ?>">ABOUT</a></li>
+                <li><a href="<?php echo esc_url(home_url('/contact/')); ?>">CONTACT</a></li>
                 <li><a href="">SHOP</a></li>
-                <li><a href="">INFORMATION</a></li>
+                <li><a href="<?php echo esc_url(home_url('/information/')); ?>">INFORMATION</a></li>
             </ul>
             <form action="<?php echo esc_url(home_url('/')); ?>" method="get" class="header__search">
                 <label><input type="text" name="s" value="<?php echo esc_attr(get_search_query()); ?>" placeholder="SEARCH"></label>
