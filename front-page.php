@@ -181,27 +181,72 @@ get_header();
     </section>
     <?php endif; ?>
     <!-- artfair -->
+    <?php
+    $artfair_query = new WP_Query(array(
+        'post_type' => 'artfairs',
+        'posts_per_page' => 4,
+        'post_status' => 'publish',
+        'tax_query' => array(
+            array(
+                'taxonomy' => 'exhibition_status',
+                'field' => 'slug',
+                'terms' => array('current', 'forthcoming'),
+            ),
+        ),
+    ));
+    ?>
+    <?php if ($artfair_query->have_posts()) : ?>
     <section class="top__section top__section--artfair">
         <div class="top__inner">
             <h2 class="top__title">ARTFAIR</h2>
             <ul class="top__events">
+                <?php while ($artfair_query->have_posts()) : $artfair_query->the_post();
+                    $af_id = get_the_ID();
+                    $af_thumbnail = get_field('thumbnail', $af_id);
+                    $af_mv = get_field('main_visual', $af_id);
+                    if (!$af_thumbnail && !empty($af_mv['image'])) {
+                        $af_thumbnail = $af_mv['image'];
+                    }
+                    $af_subtitle = get_field('subtitle', $af_id);
+                    $af_period = get_field('period', $af_id);
+                    $af_artists_obj = get_field('artists', $af_id);
+                    $af_artist_names = [];
+                    if ($af_artists_obj) {
+                        foreach ($af_artists_obj as $af_artist) {
+                            $ar_id = is_object($af_artist) ? $af_artist->ID : $af_artist;
+                            $ar_overview = get_field('overview', $ar_id);
+                            $af_artist_names[] = $ar_overview['name2'] ?? get_the_title($ar_id);
+                        }
+                    }
+                    $af_artist_text = implode('／', $af_artist_names);
+                ?>
                 <li class="event js-fade-up">
-                    <a href="<?php echo esc_url( home_url( '/artfairs/art-fair-tokyo-2026/' ) ); ?>" class="event__img">
+                    <a href="<?php the_permalink(); ?>" class="event__img">
                     <figure>
-                        <img src="<?php echo esc_url(get_template_directory_uri() . '/assets/img/top/img_artfair-list-aft2026.jpg'); ?>" alt="" loading="lazy">
+                        <?php if ($af_thumbnail) : ?>
+                        <img src="<?php echo esc_url($af_thumbnail['url']); ?>" alt="<?php echo esc_attr($af_thumbnail['alt'] ?? ''); ?>" loading="lazy">
+                        <?php endif; ?>
                     </figure>
                     </a>
                     <div class="event__info">
-                    <h3 class="event__title">ART FAIR TOKYO 2026</h3>
-                    <!-- <p class="event__lead"></p> -->
-                    <p class="event__note">有馬晋平／大岩オスカール／谷﨑一心／長島伊織／吉田紳平</p>
-                    <p class="event__date"><span>2026.03.13<span class="day">（金）</span></span><span class="en-dash">-</span><span>03.15<span class="day">（日）</span></span></p>
-                    <a href="<?php echo esc_url( home_url( '/artfairs/art-fair-tokyo-2026/' ) ); ?>" class="event__link u-link-more">Learn more</a>
+                    <h3 class="event__title"><?php the_title(); ?></h3>
+                    <?php if ($af_subtitle) : ?>
+                    <p class="event__lead"><?php echo esc_html($af_subtitle); ?></p>
+                    <?php endif; ?>
+                    <?php if ($af_artist_text) : ?>
+                    <p class="event__note"><?php echo esc_html($af_artist_text); ?></p>
+                    <?php endif; ?>
+                    <?php if ($af_period) : ?>
+                    <p class="event__date"><?php echo esc_html($af_period); ?></p>
+                    <?php endif; ?>
+                    <a href="<?php the_permalink(); ?>" class="event__link u-link-more">Learn more</a>
                     </div>
                 </li>
+                <?php endwhile; wp_reset_postdata(); ?>
             </ul>
         </div>
     </section>
+    <?php endif; ?>
     <!-- news -->
     <?php
     $news_query = new WP_Query(array(
