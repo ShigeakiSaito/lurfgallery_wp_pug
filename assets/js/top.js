@@ -2,7 +2,7 @@ window.addEventListener('load', () => {
   // topMvSwiper
   const mvContainer = document.querySelector('.top__mv');
   const progressWrapper = document.querySelector('.mv-progressbars');
-  const controllerWrapper = document.querySelector('.swiper-controller-wrapper');
+  const controllerWrapper = document.querySelector('.top__mv .swiper-controller-wrapper');
 
   // 複製スライドを除いた実質的な枚数
   const slides = document.querySelectorAll(

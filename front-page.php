@@ -203,24 +203,38 @@ get_header();
         </div>
     </section>
     <!-- news -->
+    <?php
+    $news_query = new WP_Query(array(
+        'post_type' => 'post',
+        'posts_per_page' => 4,
+        'post_status' => 'publish',
+    ));
+    ?>
+    <?php if ($news_query->have_posts()) : ?>
     <section class="top__section top__section--news">
         <div class="top__inner">
             <h2 class="top__title">NEWS</h2>
             <div class="top__newslist js-fade-up">
             <div class="swiper" id="topNewsSwiper">
                 <div class="swiper-wrapper">
-                    <!-- <div class="swiper-slide news">
-                        <a href="" class="news__img">
+                    <?php while ($news_query->have_posts()) : $news_query->the_post(); ?>
+                    <div class="swiper-slide news">
+                        <a href="<?php the_permalink(); ?>" class="news__img">
                         <figure>
-                            <img src="<?php echo esc_url(get_template_directory_uri() . '/assets/img/top/img_news01.png'); ?>" alt="" loading="lazy">
+                            <?php if (has_post_thumbnail()) : ?>
+                            <img src="<?php echo esc_url(get_the_post_thumbnail_url(get_the_ID(), 'medium_large')); ?>" alt="<?php the_title_attribute(); ?>" loading="lazy">
+                            <?php else : ?>
+                            <img src="<?php echo esc_url(get_template_directory_uri() . '/assets/img/common/noimage.png'); ?>" alt="" loading="lazy">
+                            <?php endif; ?>
                         </figure>
                         </a>
                         <div class="news__info">
-                        <h3 class="news__title">【7月/8月】休館日および営業時間変更のお知らせ</h3>
-                        <p class="news__date">2025.06.21</p>
-                        <a href="" class="news__link u-link-more">Learn more</a>
-                        </div> 
-                    </div> -->
+                        <h3 class="news__title"><?php the_title(); ?></h3>
+                        <p class="news__date"><?php echo get_the_date('Y.m.d'); ?></p>
+                        <a href="<?php the_permalink(); ?>" class="news__link u-link-more">Learn more</a>
+                        </div>
+                    </div>
+                    <?php endwhile; wp_reset_postdata(); ?>
                 </div>
             </div>
             <div class="swiper-controller-wrapper">
@@ -231,6 +245,7 @@ get_header();
             </div>
         </div>
     </section>
+    <?php endif; ?>
 </main>
 
 <?php
