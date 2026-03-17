@@ -48,7 +48,7 @@ get_header();
     <!-- exhibitions -->
     <section class="top__section top__section--exhibitions">
         <div class="top__inner">
-            <h2 class="top__title">FORTHCOMING EXHIBITIONS</h2>
+            <h2 class="top__title">CURRENT EXHIBITIONS</h2>
             <ul class="top__events">
                 <li class="event js-fade-up">
                     <a href="<?php echo esc_url( home_url( '/exhibitions/group-exhibition-imagination/' ) ); ?>" class="event__img">
