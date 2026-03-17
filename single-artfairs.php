@@ -120,11 +120,25 @@
 				<div class="exhibition-detail__statement-body" style="--clamp-lines-pc: <?php echo (int)$line_num_pc; ?>; --clamp-lines-sp: <?php echo (int)$line_num_sp; ?>;">
 					<?php echo wp_kses_post($statement); ?>
 				</div>
+				<div class="exhibition-detail__statement-viewmore">
+					<button type="button" class="artist-detail__overview-viewmore-btn js-statement-toggle">
+						<span class="artist-detail__overview-viewmore-label">View more</span>
+						<span class="artist-detail__overview-viewmore-icon"></span>
+					</button>
+				</div>
 			</div>
 			<?php endif; ?>
 			<?php if ($contribution) : ?>
-			<div class="exhibition-detail__statement-lower" style="--clamp-lines-pc: <?php echo (int)$line_num_pc; ?>; --clamp-lines-sp: <?php echo (int)$line_num_sp; ?>;">
-				<?php echo wp_kses_post($contribution); ?>
+			<div class="exhibition-detail__statement-lower">
+				<div class="exhibition-detail__statement-body" style="--clamp-lines-pc: <?php echo (int)$line_num_pc; ?>; --clamp-lines-sp: <?php echo (int)$line_num_sp; ?>;">
+					<?php echo wp_kses_post($contribution); ?>
+				</div>
+				<div class="exhibition-detail__statement-viewmore">
+					<button type="button" class="artist-detail__overview-viewmore-btn js-statement-toggle">
+						<span class="artist-detail__overview-viewmore-label">View more</span>
+						<span class="artist-detail__overview-viewmore-icon"></span>
+					</button>
+				</div>
 			</div>
 			<?php endif; ?>
 		</section>
@@ -578,6 +592,22 @@
 				updateMoreVisibility();
 			});
 		}
+	});
+
+	// ----- Statement / Contribution View more -----
+	document.querySelectorAll('.js-statement-toggle').forEach(function(toggle) {
+		var wrapper = toggle.closest('.exhibition-detail__statement-upper') || toggle.closest('.exhibition-detail__statement').querySelector('.exhibition-detail__statement-lower') ? toggle.parentElement.previousElementSibling : null;
+		var target = toggle.parentElement.previousElementSibling;
+		if (!target) return;
+
+		toggle.addEventListener('click', function() {
+			var isExtended = target.classList.toggle('is-extended');
+			toggle.classList.toggle('is-expanded', isExtended);
+			var label = toggle.querySelector('.artist-detail__overview-viewmore-label');
+			if (label) {
+				label.textContent = isExtended ? 'View less' : 'View more';
+			}
+		});
 	});
 	</script>
 
