@@ -68,6 +68,107 @@ function theme_enqueue_assets() {
 add_action('wp_enqueue_scripts', 'theme_enqueue_assets');
 
 add_theme_support('post-thumbnails');
+add_theme_support('title-tag');
+
+// カスタムタイトルタグ
+function custom_document_title( $title ) {
+	$site_name = 'LURF GALLERY';
+	$sep = '｜';
+
+	// トップページ
+	if ( is_front_page() ) {
+		return $site_name . $sep . 'Contemporary Art Gallery';
+	}
+
+	// 404
+	if ( is_404() ) {
+		return 'Page not found' . $sep . $site_name;
+	}
+
+	// 検索結果
+	if ( is_search() ) {
+		return 'Search Results: ' . get_search_query() . $sep . $site_name;
+	}
+
+	// 投稿タイプアーカイブ
+	if ( is_post_type_archive( 'exhibitions' ) ) {
+		return 'EXHIBITIONS' . $sep . $site_name;
+	}
+	if ( is_post_type_archive( 'artfairs' ) ) {
+		return 'ART FAIR' . $sep . $site_name;
+	}
+	if ( is_post_type_archive( 'artists' ) ) {
+		return 'ARTISTS' . $sep . $site_name;
+	}
+
+	// News一覧 (home.php)
+	if ( is_home() ) {
+		return 'NEWS' . $sep . $site_name;
+	}
+
+	// 投稿詳細
+	if ( is_singular() ) {
+		$post_type = get_post_type();
+
+		switch ( $post_type ) {
+			case 'exhibitions':
+				return get_the_title() . $sep . 'EXHIBITIONS' . $sep . $site_name;
+
+			case 'artfairs':
+				return get_the_title() . $sep . 'ART FAIR' . $sep . $site_name;
+
+			case 'artists':
+				$overview = get_field( 'overview' );
+				$name1 = $overview['name1'] ?? '';
+				$name2 = $overview['name2'] ?? '';
+				$artist_title = trim( $name1 . ' ' . $name2 );
+				if ( ! $artist_title ) {
+					$artist_title = get_the_title();
+				}
+				return $artist_title . $sep . 'ARTISTS' . $sep . $site_name;
+
+			case 'artworks':
+				$artist_name = get_field( 'artist_name' );
+				$work_title = get_field( 'title' );
+				$parts = [];
+				if ( ! empty( $artist_name['value'] ) ) $parts[] = $artist_name['value'];
+				if ( ! empty( $work_title['value'] ) ) $parts[] = $work_title['value'];
+				$item_title = implode( ' - ', $parts );
+				if ( ! $item_title ) $item_title = get_the_title();
+				return $item_title . $sep . 'EXHIBITIONS' . $sep . $site_name;
+
+			case 'editions':
+				$artist_name = get_field( 'artist_name' );
+				$work_title = get_field( 'title' );
+				$parts = [];
+				if ( ! empty( $artist_name['value'] ) ) $parts[] = $artist_name['value'];
+				if ( ! empty( $work_title['value'] ) ) $parts[] = $work_title['value'];
+				$item_title = implode( ' - ', $parts );
+				if ( ! $item_title ) $item_title = get_the_title();
+				return $item_title . $sep . 'EDITIONS' . $sep . $site_name;
+
+			case 'books':
+				$artist_name = get_field( 'artist_name' );
+				$work_title = get_field( 'title' );
+				$parts = [];
+				if ( ! empty( $artist_name['value'] ) ) $parts[] = $artist_name['value'];
+				if ( ! empty( $work_title['value'] ) ) $parts[] = $work_title['value'];
+				$item_title = implode( ' - ', $parts );
+				if ( ! $item_title ) $item_title = get_the_title();
+				return $item_title . $sep . 'EXHIBITIONS' . $sep . $site_name;
+
+			case 'post':
+				return get_the_title() . $sep . 'NEWS' . $sep . $site_name;
+
+			case 'page':
+				return get_the_title() . $sep . $site_name;
+		}
+	}
+
+	// フォールバック
+	return get_the_title() . $sep . $site_name;
+}
+add_filter( 'pre_get_document_title', 'custom_document_title' );
 
 // 投稿機能の追加
 function create_post_type() {
