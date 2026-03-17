@@ -11,6 +11,7 @@ $noimage = esc_url(get_template_directory_uri() . '/assets/img/common/noimage.pn
 $exhibitions = get_field('exhibitions');
 $artfairs = get_field('artfairs');
 $news = get_field('news');
+$product = get_field('product');
 
 // ===== SELECTED ARTWORKS: 初期表示行数（変更はここだけ） =====
 $artworks_initial_rows = 5; // PC版で表示する行数
@@ -58,7 +59,7 @@ $artworks_initial_rows = 5; // PC版で表示する行数
 		$has_exhibitions = !empty($exhibitions);
 		$has_fairs = !empty($artfairs);
 		$has_news = !empty($news);
-		$has_product = false;
+		$has_product = !empty($product['image']) || !empty($product['description']);
 		?>
 		<nav class="artist-detail__nav" id="js-artist-nav">
 			<ul class="artist-detail__nav-list">
@@ -452,6 +453,28 @@ $artworks_initial_rows = 5; // PC版で表示する行数
 					</div>
 				</div>
 			</div>
+		</section>
+		<?php endif; ?>
+
+		<!-- ===== Section 09: PRODUCT ===== -->
+		<?php if ($has_product) : ?>
+		<section class="artist-detail__product" id="product">
+			<h3 class="artist-detail__section-heading">Product</h3>
+			<?php if (!empty($product['image'])) : ?>
+			<div class="artist-detail__product-content">
+				<div class="artist-detail__product-img">
+					<img src="<?php echo esc_url($product['image']['url']); ?>" alt="<?php echo esc_attr($product['image']['alt']); ?>" loading="lazy">
+				</div>
+			</div>
+			<?php endif; ?>
+			<?php if (!empty($product['description'])) : ?>
+			<p class="artist-detail__product-text"><?php echo nl2br(esc_html($product['description'])); ?></p>
+			<?php endif; ?>
+			<?php if (!empty($product['shop_name']) && !empty($product['shop_url'])) : ?>
+			<p class="artist-detail__product-shop">
+				<?php echo esc_html($product['shop_name']); ?> : <a href="<?php echo esc_url($product['shop_url']); ?>" target="_blank" rel="noopener noreferrer"><?php echo esc_html($product['shop_url']); ?></a>
+			</p>
+			<?php endif; ?>
 		</section>
 		<?php endif; ?>
 
