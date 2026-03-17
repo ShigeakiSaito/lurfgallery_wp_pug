@@ -11,6 +11,7 @@ $noimage = esc_url(get_template_directory_uri() . '/assets/img/common/noimage.pn
 $exhibitions = get_field('exhibitions');
 $artfairs = get_field('artfairs');
 $news = get_field('news');
+$product = get_field('product');
 
 // ===== SELECTED ARTWORKS: 初期表示行数（変更はここだけ） =====
 $artworks_initial_rows = 5; // PC版で表示する行数
@@ -58,7 +59,7 @@ $artworks_initial_rows = 5; // PC版で表示する行数
 		$has_exhibitions = !empty($exhibitions);
 		$has_fairs = !empty($artfairs);
 		$has_news = !empty($news);
-		$has_product = false;
+		$has_product = !empty($product['image']) || !empty($product['description']);
 		?>
 		<nav class="artist-detail__nav" id="js-artist-nav">
 			<ul class="artist-detail__nav-list">
@@ -94,11 +95,19 @@ $artworks_initial_rows = 5; // PC版で表示する行数
 						<?php
 						$image1 = $overview['image1'] ?? null;
 						$image1_display = $image1['display'] ?? '';
-						$image1_id = $image1['image'] ?? null;
-						$image1_url = $image1_id ? wp_get_attachment_image_url($image1_id, 'medium_large') : '';
-						$image1_alt = $image1_id ? get_post_meta($image1_id, '_wp_attachment_image_alt', true) : '';
-						if ($image1_display === 'detail' && $image1_url) : ?>
-						<img src="<?php echo esc_url($image1_url); ?>" alt="<?php echo esc_attr($image1_alt); ?>" width="386" height="386" loading="lazy">
+						$image2 = $overview['image2'] ?? null;
+						$image2_display = $image2['display'] ?? '';
+						if ($image1_display === 'detail') {
+							$image = $image1['image'] ?? null;
+						} elseif ($image2_display === 'detail') {
+							$image = $image2['image'] ?? null;
+						} else {
+							$image = $image1['image'] ?? null;
+						}
+						$image_url = $image['url'] ?? '';
+						$image_alt = $image['alt'] ?? '';
+						if ($image_url) : ?>
+						<img src="<?php echo esc_url($image_url); ?>" alt="<?php echo esc_attr($image_alt); ?>" width="386" height="386" loading="lazy">
 						<?php else : ?>
 						<img src="<?php echo $noimage; ?>" alt="" width="386" height="386" loading="lazy">
 						<?php endif; ?>
@@ -111,8 +120,11 @@ $artworks_initial_rows = 5; // PC版で表示する行数
 						<div class="artist-detail__overview-links">
 							<?php for ($i = 1; $i <= 3; $i++) :
 								$link = $overview["link{$i}"] ?? '';
-								if ($link) : ?>
-							<a href="<?php echo esc_url($link); ?>" class="artist-detail__overview-link" target="_blank" rel="noopener noreferrer"><?php echo esc_html($link); ?></a>
+								if ($link['url']) : 
+									$link_url = $link['url'] ?? '';
+									$link_text = $link['text'] ? $link['text'] : $link_url;
+								?>
+							<a href="<?php echo esc_url($link_url); ?>" class="artist-detail__overview-link" target="_blank" rel="noopener noreferrer"><?php echo esc_html($link_text); ?></a>
 							<?php endif; endfor; ?>
 						</div>
 					</div>
@@ -182,17 +194,18 @@ $artworks_initial_rows = 5; // PC版で表示する行数
 						$artwork_year = get_field('year', $artwork_id);
 						$artwork_material = get_field('material', $artwork_id);
 						$artwork_size = get_field('size', $artwork_id);
+						$artwork_description = get_field('description', $artwork_id);
+						$artwork_note = get_field('note', $artwork_id);
 
-						$artist_text = (!empty($artwork_artist['is_display']) && !empty($artwork_artist['value'])) ? $artwork_artist['value'] : '';
-						$title_text = (!empty($artwork_title['is_display']) && !empty($artwork_title['value'])) ? $artwork_title['value'] : '';
+						$artwork_title = (!empty($artwork_title['is_display_index']) && !empty($artwork_title['value'])) ? $artwork_title['value'] : '';
+						$artwork_year = (!empty($artwork_year['is_display_index']) && !empty($artwork_year['value'])) ? $artwork_year['value'] : '';
+						$artwork_material = (!empty($artwork_material['is_display_index']) && !empty($artwork_material['value'])) ? $artwork_material['value'] : '';
+						$artwork_size = (!empty($artwork_size['is_display_index']) && !empty($artwork_size['value'])) ? $artwork_size['value'] : '';
+						$artwork_description = (!empty($artwork_description['is_display_index']) && !empty($artwork_description['value'])) ? $artwork_description['value'] : '';
+						$artwork_note = (!empty($artwork_note['is_display_index']) && !empty($artwork_note['value'])) ? $artwork_note['value'] : '';
 
-						$spec_parts = [];
-						foreach ([$artwork_year, $artwork_material, $artwork_size] as $spec) {
-							if (!empty($spec['is_display']) && !empty($spec['value'])) {
-								$spec_parts[] = $spec['value'];
-							}
-						}
-						$spec_text = implode(', ', $spec_parts);
+						$artist_text = $artwork_artist['value'] ?? '';
+						$spec_text = implode(', ', array_filter([$artwork_title, $artwork_year, $artwork_material, $artwork_size, $artwork_description, $artwork_note]));
 
 						// 初期表示件数を超えたら is-hidden を付与
 						$hidden_class = ($index >= $initial_visible) ? ' is-hidden' : '';
@@ -208,9 +221,6 @@ $artworks_initial_rows = 5; // PC版で表示する行数
 						<div class="artist-detail__artwork-info">
 							<?php if ($artist_text) : ?>
 							<p class="artist-detail__artwork-artist"><?php echo esc_html($artist_text); ?></p>
-							<?php endif; ?>
-							<?php if ($title_text) : ?>
-							<p class="artist-detail__artwork-title"><?php echo esc_html($title_text); ?></p>
 							<?php endif; ?>
 							<?php if ($spec_text) : ?>
 							<p class="artist-detail__artwork-spec"><?php echo esc_html($spec_text); ?></p>
@@ -443,6 +453,28 @@ $artworks_initial_rows = 5; // PC版で表示する行数
 					</div>
 				</div>
 			</div>
+		</section>
+		<?php endif; ?>
+
+		<!-- ===== Section 09: PRODUCT ===== -->
+		<?php if ($has_product) : ?>
+		<section class="artist-detail__product" id="product">
+			<h3 class="artist-detail__section-heading">Product</h3>
+			<?php if (!empty($product['image'])) : ?>
+			<div class="artist-detail__product-content">
+				<div class="artist-detail__product-img">
+					<img src="<?php echo esc_url($product['image']['url']); ?>" alt="<?php echo esc_attr($product['image']['alt']); ?>" loading="lazy">
+				</div>
+			</div>
+			<?php endif; ?>
+			<?php if (!empty($product['description'])) : ?>
+			<p class="artist-detail__product-text"><?php echo nl2br(esc_html($product['description'])); ?></p>
+			<?php endif; ?>
+			<?php if (!empty($product['shop_name']) && !empty($product['shop_url'])) : ?>
+			<p class="artist-detail__product-shop">
+				<?php echo esc_html($product['shop_name']); ?> : <a href="<?php echo esc_url($product['shop_url']); ?>" target="_blank" rel="noopener noreferrer"><?php echo esc_html($product['shop_url']); ?></a>
+			</p>
+			<?php endif; ?>
 		</section>
 		<?php endif; ?>
 
