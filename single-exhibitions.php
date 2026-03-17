@@ -15,6 +15,12 @@
 				<?php if (!empty($main_visual['text2'])) : ?>
 				<p class="exhibition-detail__mv-period"><?php echo esc_html($main_visual['text2']); ?></p>
 				<?php endif; ?>
+				<?php if (!empty($main_visual['text3'])) : ?>
+				<p class="exhibition-detail__mv-text3"><?php echo esc_html($main_visual['text3']); ?></p>
+				<?php endif; ?>
+				<?php if (!empty($main_visual['text4'])) : ?>
+				<p class="exhibition-detail__mv-text4"><?php echo esc_html($main_visual['text4']); ?></p>
+				<?php endif; ?>
 			</div>
 		</section>
 		<?php endif; ?>
