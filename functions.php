@@ -72,18 +72,18 @@ add_theme_support('post-thumbnails');
 // 投稿機能の追加
 function create_post_type() {
 	// exhibitions
-  register_post_type( 'exhibitions',
+	register_post_type( 'exhibitions',
     array(
-      'labels' => array(
-        'name' => __( 'exhibitions' ),
-        'singular_name' => __( 'exhibitions' )
-      ),
-      'public' => true,
-			'show_in_rest' => true,
-      'has_archive' => true,
-      'menu_position' => 6,
-			'supports' => array('title', 'custom-fields'),
-			'taxonomies' => array('exhibition_status', 'exhibition_year'),
+		'labels' => array(
+			'name' => __( 'exhibitions' ),
+			'singular_name' => __( 'exhibitions' )
+		),
+		'public' => true,
+		'show_in_rest' => true,
+		'has_archive' => true,
+		'menu_position' => 6,
+		'supports' => array('title', 'custom-fields'),
+		'taxonomies' => array('exhibition_status', 'exhibition_year'),
     )
 	);
 	// artworks
