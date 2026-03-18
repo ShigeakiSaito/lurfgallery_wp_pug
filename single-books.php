@@ -77,9 +77,25 @@
 					<?php endif; ?>
 					<?php $buttons = get_field('buttons'); ?>
 					<?php if (!empty($buttons['contact']) || !empty($buttons['purchase'])) : ?>
+					<?php
+					// 作品お問い合わせURL構築
+					$release_date_field = get_field('release_date');
+					$size_field = get_field('size');
+					$contact_params = [
+						'artwork_artist'   => !empty($artist_name['value']) ? $artist_name['value'] : '',
+						'artwork_title'    => !empty($title['value']) ? $title['value'] : '',
+						'artwork_year'     => !empty($release_date_field['value']) ? $release_date_field['value'] : '',
+						'artwork_size'     => !empty($size_field['value']) ? $size_field['value'] : '',
+						'ref'              => get_permalink(),
+					];
+					if (!empty($images[0]['image']['url'])) {
+						$contact_params['artwork_image'] = $images[0]['image']['url'];
+					}
+					$art_contact_url = home_url('/art_contact/') . '?' . http_build_query($contact_params);
+					?>
 					<div class="books-detail__buttons">
 						<?php if (!empty($buttons['contact'])) : ?>
-						<a href="/art_contact/" class="books-detail__button">CONTACT</a>
+						<a href="<?php echo esc_url($art_contact_url); ?>" class="books-detail__button">CONTACT</a>
 						<?php endif; ?>
 						<?php if (!empty($buttons['purchase'])) : ?>
 						<a href="<?php echo esc_url(get_field('purchase_url')); ?>" class="books-detail__button">PURCHASE</a>
