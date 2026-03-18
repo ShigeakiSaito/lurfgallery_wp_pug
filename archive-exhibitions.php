@@ -78,8 +78,9 @@
 		$list_posts = [];
 
 		foreach ($exhibitions as $ex) {
-			$ex_statuses = wp_get_post_terms($ex->ID, 'exhibition_status', array('fields' => 'slugs'));
-			if ($current_status === 'past' || in_array('past', $ex_statuses, true)) {
+			$ex_image = get_field('main_visual', $ex->ID)['image'] ?? null;
+			$ex_no_image = get_field('no_display_image', $ex->ID) ?? false;
+			if (!$ex_image || $ex_no_image) { // メインビジュアルがない、または「画像非表示」がtrueの場合はリスト表示
 				$list_posts[] = $ex;
 			} else {
 				$featured_posts[] = $ex;
@@ -99,8 +100,12 @@
 		$featured_index = 0;
 		foreach ($featured_posts as $ft_post) :
 			$ft_id = $ft_post->ID;
+			$ft_thumbnail = get_field('thumbnail', $ft_id);
 			$ft_mv = get_field('main_visual', $ft_id);
 			$ft_mv_image = (!empty($ft_mv['image'])) ? $ft_mv['image'] : null;
+			if (!$ft_thumbnail) {
+				$ft_thumbnail = $ft_mv_image; // サムネイルがない場合はメインビジュアルを使用
+			}
 			$ft_subtitle = get_field('subtitle', $ft_id);
 			$ft_overview_table = get_field('overview_table', $ft_id);
 			$ft_period = (!empty(get_field('period', $ft_id))) ? get_field('period', $ft_id) : '';
@@ -116,15 +121,15 @@
 					$ft_artist_names[] = $ar_overview['name2'] ?? get_the_title($ar_id);
 				}
 			}
-			$ft_artist_text = implode('、', $ft_artist_names);
+			$ft_artist_text = implode('／', $ft_artist_names);
 
 			$reverse_class = ($featured_index % 2 === 1) ? ' exhibitions-index__featured--reverse' : '';
 			$featured_index++;
 		?>
 		<section class="exhibitions-index__featured<?php echo $reverse_class; ?>">
-			<?php if ($ft_mv_image) : ?>
+			<?php if ($ft_thumbnail) : ?>
 			<picture class="exhibitions-index__featured-img">
-				<img src="<?php echo esc_url($ft_mv_image['url']); ?>" alt="<?php echo esc_attr($ft_mv_image['alt']); ?>" width="772" height="514" loading="eager">
+				<img src="<?php echo esc_url($ft_thumbnail['url']); ?>" alt="<?php echo esc_attr($ft_thumbnail['alt']); ?>" width="772" height="514" loading="eager">
 			</picture>
 			<?php endif; ?>
 			<div class="exhibitions-index__featured-text">
@@ -171,7 +176,7 @@
 						$li_artist_names[] = $ar_overview['name2'] ?? get_the_title($ar_id);
 					}
 				}
-				$li_artist_text = implode('、', $li_artist_names);
+				$li_artist_text = implode('／', $li_artist_names);
 
 				$hidden_class = ($list_index >= $initial_visible) ? ' is-hidden' : '';
 				$list_index++;

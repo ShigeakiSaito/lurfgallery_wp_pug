@@ -1,19 +1,25 @@
 <?php get_header(); ?>
 
-	<main class="artfair-detail">
-		<h1>ART FAIR DETAIL</h1>
+	<main class="exhibition-detail">
+		<h1>EXHIBITION DETAIL</h1>
 
 		<!-- ===== Section 01: メインビジュアル ===== -->
 		<?php $main_visual = get_field('main_visual'); ?>
 		<?php if (!empty($main_visual['image'])) : ?>
-		<section class="artfair-detail__mv">
-			<img class="artfair-detail__mv-img" src="<?php echo esc_url($main_visual['image']['url']); ?>" alt="<?php echo esc_attr($main_visual['image']['alt']); ?>" width="1512" height="640" loading="eager">
-			<div class="artfair-detail__mv-overlay">
+		<section class="exhibition-detail__mv">
+			<img class="exhibition-detail__mv-img" src="<?php echo esc_url($main_visual['image']['url']); ?>" alt="<?php echo esc_attr($main_visual['image']['alt']); ?>" width="1512" height="640" loading="eager">
+			<div class="exhibition-detail__mv-overlay">
 				<?php if (!empty($main_visual['text1'])) : ?>
-				<h2 class="artfair-detail__mv-title"><?php echo nl2br(esc_html($main_visual['text1'])); ?></h2>
+				<h2 class="exhibition-detail__mv-title"><?php echo nl2br(esc_html($main_visual['text1'])); ?></h2>
 				<?php endif; ?>
 				<?php if (!empty($main_visual['text2'])) : ?>
-				<p class="artfair-detail__mv-period"><?php echo esc_html($main_visual['text2']); ?></p>
+				<p class="exhibition-detail__mv-period"><?php echo esc_html($main_visual['text2']); ?></p>
+				<?php endif; ?>
+				<?php if (!empty($main_visual['text3'])) : ?>
+				<p class="exhibition-detail__mv-text3"><?php echo esc_html($main_visual['text3']); ?></p>
+				<?php endif; ?>
+				<?php if (!empty($main_visual['text4'])) : ?>
+				<p class="exhibition-detail__mv-text4"><?php echo esc_html($main_visual['text4']); ?></p>
 				<?php endif; ?>
 			</div>
 		</section>
@@ -35,15 +41,15 @@
 		}
 		?>
 		<?php if ($release_files || $contact) : ?>
-		<section class="artfair-detail__materials">
-			<div class="artfair-detail__materials-inner">
+		<section class="exhibition-detail__materials">
+			<div class="exhibition-detail__materials-inner">
 				<?php if ($release_files) : ?>
-				<ul class="artfair-detail__materials-list">
+				<ul class="exhibition-detail__materials-list">
 					<?php foreach ($release_files as $file) : ?>
 					<li>
-						<a href="<?php echo esc_url($file['url']); ?>" class="artfair-detail__materials-link" target="_blank" rel="noopener noreferrer" download>
+						<a href="<?php echo esc_url($file['url']); ?>" class="exhibition-detail__materials-link" target="_blank" rel="noopener noreferrer" download>
 							<?php echo esc_html($file['filename']); ?>
-							<svg class="artfair-detail__materials-icon" width="24" height="24" viewBox="0 -960 960 960" xmlns="http://www.w3.org/2000/svg">
+							<svg class="exhibition-detail__materials-icon" width="24" height="24" viewBox="0 -960 960 960" xmlns="http://www.w3.org/2000/svg">
 								<path d="M480-340 280-540l56-56 104 104v-348h80v348l104-104 56 56-200 200ZM240-160q-33 0-56.5-23.5T160-240v-120h80v120h480v-120h80v120q0 33-23.5 56.5T720-160H240Z" fill="#1F1F1F"></path>
 							</svg>
 						</a>
@@ -52,7 +58,7 @@
 				</ul>
 				<?php endif; ?>
 				<?php if ($contact) : ?>
-				<a href="/contact/" class="artfair-detail__materials-contact">Contact</a>
+				<a href="/contact/" class="exhibition-detail__materials-contact">Contact</a>
 				<?php endif; ?>
 			</div>
 		</section>
@@ -61,8 +67,8 @@
 		<!-- ===== Section 04: 展示会説明 ===== -->
 		<?php $description = get_field('description'); ?>
 		<?php if ($description) : ?>
-		<section class="artfair-detail__description">
-			<div class="artfair-detail__description-body">
+		<section class="exhibition-detail__description">
+			<div class="exhibition-detail__description-body">
 				<p><?php echo nl2br(esc_html($description)); ?></p>
 			</div>
 		</section>
@@ -73,48 +79,72 @@
 		<?php $overview_table = get_field('overview_table'); ?>
 		<?php $overview_note = get_field('overview_note'); ?>
 		<?php if ($overview || $overview_table || $overview_note) : ?>
-		<section class="artfair-detail__overview">
+		<section class="exhibition-detail__overview">
 			<?php if ($overview) : ?>
-			<h3 class="artfair-detail__overview-title">展示概要</h3>
-			<div class="artfair-detail__overview-content">
+			<h3 class="exhibition-detail__overview-title">展示概要</h3>
+			<div class="exhibition-detail__overview-content wysiwyg">
 			<?php echo wp_kses_post($overview); ?>
 			</div>
 			<?php endif; ?>
 			<?php if ($overview_table) : ?>
 				<?php if ($overview_table['title']) : ?>
-			<p class="artfair-detail__overview-subtitle"><?php echo esc_html($overview_table['title']); ?></p>
+			<p class="exhibition-detail__overview-subtitle"><?php echo esc_html($overview_table['title']); ?></p>
 				<?php endif; ?>
-			<ul class="artfair-detail__overview-list">
-				<?php foreach ($overview_table['table'] as $item) : ?>
-			<li class="artfair-detail__overview-item">
-				<span class="artfair-detail__overview-label"><?php echo esc_html($item['term']); ?></span>
-				<span class="artfair-detail__overview-value"><?php echo esc_html($item['description']); ?></span>
-			</li>
+			<ul class="exhibition-detail__overview-list">
+				<?php $pairs = $overview_table['rows']; ?>
+				<?php foreach ($pairs as $pair) : ?>
+					<?php if (!empty($pair['desc'])) : ?>
+				<li class="exhibition-detail__overview-item">
+					<span class="exhibition-detail__overview-label"><?php echo esc_html($pair['term']); ?></span>
+					<span class="exhibition-detail__overview-value"><?php echo nl2br(esc_html($pair['desc'])); ?></span>
+				</li>
+					<?php endif; ?>
 				<?php endforeach; ?>
 			</ul>
-			<?php endif; ?>
-			<?php if ($overview_note) : ?>
+				<?php endif; ?>
+				<?php if ($overview_note) : ?>
 			<p><?php echo wp_kses_post($overview_note); ?></p>
 			<?php endif; ?>
 		</section>
 		<?php endif; ?>
 
 		<!-- ===== Section 06: ステートメント / 寄稿文 ===== -->
-		<?php $statement = get_field('statement'); ?>
-		<?php $contribution = get_field('contribution'); ?>
+		<?php $statement_contribution = get_field('statement_contribution'); ?>
+		<?php if ($statement_contribution) : ?>
+			<?php 
+				$statement = $statement_contribution['statement']; 
+				$contribution = $statement_contribution['contribution']; 
+				$line_num_pc = $statement_contribution['line_num_pc'] ?: 99;
+				$line_num_sp = $statement_contribution['line_num_sp'] ?: 99;
+			?>
+		<?php endif; ?>
 		<?php if ($statement || $contribution) : ?>
-		<section class="artfair-detail__statement">
+		<section class="exhibition-detail__statement">
 			<?php if ($statement) : ?>
-			<div class="artfair-detail__statement-upper">
-				<p class="artfair-detail__statement-heading">Statement</p>
-				<div class="artfair-detail__statement-body">
+			<div class="exhibition-detail__statement-upper">
+				<p class="exhibition-detail__statement-heading">Statement</p>
+				<div class="exhibition-detail__statement-body" style="--clamp-lines-pc: <?php echo (int)$line_num_pc; ?>; --clamp-lines-sp: <?php echo (int)$line_num_sp; ?>;">
 					<?php echo wp_kses_post($statement); ?>
+				</div>
+				<div class="exhibition-detail__statement-viewmore">
+					<button type="button" class="artist-detail__overview-viewmore-btn js-statement-toggle">
+						<span class="artist-detail__overview-viewmore-label">View more</span>
+						<span class="artist-detail__overview-viewmore-icon"></span>
+					</button>
 				</div>
 			</div>
 			<?php endif; ?>
 			<?php if ($contribution) : ?>
-			<div class="artfair-detail__statement-lower">
-				<?php echo wp_kses_post($contribution); ?>
+			<div class="exhibition-detail__statement-lower">
+				<div class="exhibition-detail__statement-body" style="--clamp-lines-pc: <?php echo (int)$line_num_pc; ?>; --clamp-lines-sp: <?php echo (int)$line_num_sp; ?>;">
+					<?php echo wp_kses_post($contribution); ?>
+				</div>
+				<div class="exhibition-detail__statement-viewmore">
+					<button type="button" class="artist-detail__overview-viewmore-btn js-statement-toggle">
+						<span class="artist-detail__overview-viewmore-label">View more</span>
+						<span class="artist-detail__overview-viewmore-icon"></span>
+					</button>
+				</div>
 			</div>
 			<?php endif; ?>
 		</section>
@@ -122,88 +152,133 @@
 
 		<!-- ===== Section 07: FEATURED WORKS ===== -->
 		<?php $featured_works = get_field('featured_works'); ?>
-		<?php if ($featured_works) : ?>
-		<?php
-		$col = get_field('featured_works_column');
-		$col = in_array($col, ['1', '2', '3']) ? $col : '3';
-		?>
-		<section class="artfair-detail__works">
-			<h3 class="artfair-detail__section-heading">Featured Works</h3>
-			<div class="artfair-detail__works-grid">
-				<div class="artfair-detail__works-row artfair-detail__works-row--col<?php echo $col; ?>">
-					<?php
-					$visible_count = (int) $col * 5;
-					foreach ($featured_works as $index => $work) :
-						$work_images = get_field('images', $work->ID);
+		<?php if (!empty($featured_works['set'])) : ?>
+		<?php $works_initial_rows = 1; ?>
+		<section class="exhibition-detail__works">
+			<h3 class="exhibition-detail__section-heading">Featured Works</h3>
+			<div class="exhibition-detail__works-grid" id="js-works-grid">
+				<?php
+				$sets = $featured_works['set'];
+				foreach ($sets as $set) :
+					$columns = $set['columns'] ?? 'col3';
+					$works = $set['works'] ?? [];
+					if (empty($works)) continue;
+
+					// カラム数から初期表示件数を算出
+					$col_count = ($columns === 'col1') ? 1 : (($columns === 'col2') ? 2 : 3);
+					$initial_visible = $col_count * $works_initial_rows;
+				?>
+				<div class="exhibition-detail__works-row exhibition-detail__works-row--<?php echo esc_attr($columns); ?>"
+					data-col-count="<?php echo esc_attr($col_count); ?>"
+					data-initial-rows="<?php echo esc_attr($works_initial_rows); ?>">
+					<?php foreach ($works as $index => $work) :
+						$work_id = is_object($work) ? $work->ID : $work;
+						$work_images = get_field('images', $work_id);
 						$work_image = '';
 						if ($work_images && !empty($work_images[0]['image'])) {
 							$work_image = $work_images[0]['image'];
 						}
-						$work_artist = get_field('artist_name', $work->ID);
-						$work_title_field = get_field('title', $work->ID);
-						$is_hidden = $index >= $visible_count;
+						$work_artist = get_field('artist_name', $work_id);
+						$work_title_field = get_field('title', $work_id);
+						$work_year = get_field('year', $work_id);
+						$work_material = get_field('material', $work_id);
+						$work_size = get_field('size', $work_id);
+						$work_description = get_field('description', $work_id);
+						$work_note = get_field('note', $work_id);
+
+						$work_title_field = (!empty($work_title_field['is_display_index']) && !empty($work_title_field['value'])) ? $work_title_field['value'] : null;
+						$work_year = (!empty($work_year['is_display_index']) && !empty($work_year['value'])) ? $work_year['value'] : null;
+						$work_material = (!empty($work_material['is_display_index']) && !empty($work_material['value'])) ? $work_material['value'] : null;
+						$work_size = (!empty($work_size['is_display_index']) && !empty($work_size['value'])) ? $work_size['value'] : null;
+						$work_description = (!empty($work_description['is_display_index']) && !empty($work_description['value'])) ? $work_description['value'] : null;
+						$work_note = (!empty($work_note['is_display_index']) && !empty($work_note['value'])) ? $work_note['value'] : null;
+
+						$work_spec_line = implode(', ', array_filter([$work_year, $work_material, $work_size, $work_description, $work_note]));
+
+						// 初期表示件数を超えたら is-hidden を付与
+						$hidden_class = ($index >= $initial_visible) ? ' is-hidden' : '';
 					?>
-					<a href="<?php echo esc_url(get_permalink($work->ID)); ?>" class="artfair-detail__work<?php echo $is_hidden ? ' is-hidden' : ''; ?>">
+					<a href="<?php echo esc_url(get_permalink($work_id)); ?>" class="exhibition-detail__work<?php echo $hidden_class; ?>">
 						<?php if ($work_image) : ?>
-						<div class="artfair-detail__work-img">
+						<div class="exhibition-detail__work-img">
 							<img src="<?php echo esc_url($work_image['url']); ?>" alt="<?php echo esc_attr($work_image['alt']); ?>" loading="lazy">
 						</div>
 						<?php endif; ?>
-						<div class="artfair-detail__work-info">
+						<div class="exhibition-detail__work-info">
 							<?php if (!empty($work_artist['value'])) : ?>
-							<p class="artfair-detail__work-artist"><?php echo esc_html($work_artist['value']); ?></p>
+							<p class="exhibition-detail__work-artist"><?php echo esc_html($work_artist['value']); ?></p>
 							<?php endif; ?>
-							<?php if (!empty($work_title_field['value'])) : ?>
-							<p class="artfair-detail__work-spec"><?php echo esc_html($work_title_field['value']); ?></p>
+							<?php if (!empty($work_spec_line)) : ?>
+							<p class="exhibition-detail__work-spec"><?php echo esc_html($work_spec_line); ?></p>
 							<?php endif; ?>
 						</div>
 					</a>
 					<?php endforeach; ?>
 				</div>
+				<?php if (count($works) > $initial_visible) : ?>
+				<div class="exhibition-detail__works-more js-works-more">
+					<button type="button" class="u-button-more u-button-more--border">View more</button>
+				</div>
+				<?php endif; ?>
+				<?php endforeach; ?>
 			</div>
-
-			<?php if (count($featured_works) > $visible_count) : ?>
-			<!-- View more -->
-			<div class="artfair-detail__works-more" id="js-artfair-works-more">
-				<button type="button" class="u-button-more u-button-more--border">View more</button>
-			</div>
-			<?php endif; ?>
 		</section>
 		<?php endif; ?>
 
 		<!-- ===== Section 08: CONTACTボタン（セクション間） ===== -->
-		<?php $contact_url = get_field('contact_url'); ?>
-		<?php if ($contact_url) : ?>
-		<div class="artfair-detail__works-cta">
-			<p class="artfair-detail__works-cta-text">販売作品リストをご希望の方は、お問い合わせよりご連絡ください</p>
-			<a href="<?php echo esc_url($contact_url); ?>" class="artfair-detail__works-cta-button">CONTACT</a>
+		<?php $contact2 = get_field('contact2'); ?>
+		<?php if ($contact2) : ?>
+		<div class="exhibition-detail__works-cta">
+			<p class="exhibition-detail__works-cta-text">販売作品リストをご希望の方は、お問い合わせよりご連絡ください</p>
+			<a href="<?php echo home_url('contact/'); ?>" class="exhibition-detail__works-cta-button">CONTACT</a>
 		</div>
 		<?php endif; ?>
 
 		<!-- ===== Section 09: EDITION ===== -->
 		<?php $editions = get_field('editions'); ?>
 		<?php if ($editions) : ?>
-		<section class="artfair-detail__edition">
-			<h3 class="artfair-detail__section-heading">Edition</h3>
-			<div class="artfair-detail__edition-grid">
+		<section class="exhibition-detail__edition">
+			<h3 class="exhibition-detail__section-heading">Edition</h3>
+			<div class="exhibition-detail__edition-grid">
 				<?php foreach ($editions as $edition) :
 					$ed_images = get_field('images', $edition->ID);
 					$ed_image = (!empty($ed_images[0]['image'])) ? $ed_images[0]['image'] : null;
 					$ed_artist = get_field('artist_name', $edition->ID);
 					$ed_title = get_field('title', $edition->ID);
+					$ed_year = get_field('year', $edition->ID);
+					$ed_material = get_field('material', $edition->ID);
+					$ed_edition = get_field('edition', $edition->ID);
+					$ed_sign = get_field('sign', $edition->ID);
+					$ed_frame = get_field('frame', $edition->ID);
+					$ed_size = get_field('size', $edition->ID);
+					$ed_description = get_field('description', $edition->ID);
+					$ed_note = get_field('note', $edition->ID);
+					// 説明文生成
+					$ed_artist = (!empty($ed_artist['is_display_index']) && !empty($ed_artist['value'])) ? $ed_artist['value'] : null;
+					$ed_title = (!empty($ed_title['is_display_index']) && !empty($ed_title['value'])) ? $ed_title['value'] : null;
+					$ed_year = (!empty($ed_year['is_display_index']) && !empty($ed_year['value'])) ? $ed_year['value'] : null;
+					$ed_material = (!empty($ed_material['is_display_index']) && !empty($ed_material['value'])) ? $ed_material['value'] : null;
+					$ed_edition = (!empty($ed_edition['is_display_index']) && !empty($ed_edition['value'])) ? $ed_edition['value'] : null;
+					$ed_sign = (!empty($ed_sign['is_display_index']) && !empty($ed_sign['value'])) ? $ed_sign['value'] : null;
+					$ed_frame = (!empty($ed_frame['is_display_index']) && !empty($ed_frame['value'])) ? $ed_frame['value'] : null;
+					$ed_size = (!empty($ed_size['is_display_index']) && !empty($ed_size['value'])) ? $ed_size['value'] : null;
+					$ed_description = (!empty($ed_description['is_display_index']) && !empty($ed_description['value'])) ? $ed_description['value'] : null;
+					$ed_note = (!empty($ed_note['is_display_index']) && !empty($ed_note['value'])) ? $ed_note['value'] : null;
+
+					$spec_line = implode(', ', array_filter([$ed_artist, $ed_title, $ed_year, $ed_material, $ed_edition, $ed_sign, $ed_frame, $ed_description, $ed_note]));
 				?>
-				<a href="<?php echo esc_url(get_permalink($edition->ID)); ?>" class="artfair-detail__edition-item">
+				<a href="<?php echo esc_url(get_permalink($edition->ID)); ?>" class="exhibition-detail__edition-item">
 					<?php if ($ed_image) : ?>
-					<div class="artfair-detail__edition-img">
+					<div class="exhibition-detail__edition-img">
 						<img src="<?php echo esc_url($ed_image['url']); ?>" alt="<?php echo esc_attr($ed_image['alt']); ?>" loading="lazy">
 					</div>
 					<?php endif; ?>
-					<div class="artfair-detail__edition-info">
-						<?php if (!empty($ed_artist['value'])) : ?>
-						<p class="artfair-detail__edition-artist"><?php echo esc_html($ed_artist['value']); ?></p>
+					<div class="exhibition-detail__edition-info">
+						<?php if (!empty($ed_artist)) : ?>
+						<p class="exhibition-detail__edition-artist"><?php echo esc_html($ed_artist); ?></p>
 						<?php endif; ?>
-						<?php if (!empty($ed_title['value'])) : ?>
-						<p class="artfair-detail__edition-spec"><?php echo esc_html($ed_title['value']); ?></p>
+						<?php if ($spec_line) : ?>
+						<p class="exhibition-detail__edition-spec"><?php echo esc_html($spec_line); ?></p>
 						<?php endif; ?>
 					</div>
 				</a>
@@ -215,27 +290,44 @@
 		<!-- ===== Section 10: BOOKS ===== -->
 		<?php $books = get_field('books'); ?>
 		<?php if ($books) : ?>
-		<section class="artfair-detail__books">
-			<h3 class="artfair-detail__section-heading">Books</h3>
-			<div class="artfair-detail__books-grid">
+		<section class="exhibition-detail__books">
+			<h3 class="exhibition-detail__section-heading">Books</h3>
+			<div class="exhibition-detail__books-grid">
 				<?php foreach ($books as $book) :
 					$bk_images = get_field('images', $book->ID);
 					$bk_image = (!empty($bk_images[0]['image'])) ? $bk_images[0]['image'] : null;
 					$bk_artist = get_field('artist_name', $book->ID);
 					$bk_title = get_field('title', $book->ID);
+					$bk_release_date = get_field('release_date', $book->ID);
+					$bk_size = get_field('size', $book->ID);
+					$bk_page_num = get_field('page_num', $book->ID);
+					$bk_description = get_field('description', $book->ID);
+					$bk_note = get_field('note', $book->ID);
+					$bk_price = get_field('price', $book->ID);
+					// 説明文生成
+					$bk_artist = (!empty($bk_artist['is_display_index']) && !empty($bk_artist['value'])) ? $bk_artist['value'] : null;
+					$bk_title = (!empty($bk_title['is_display_index']) && !empty($bk_title['value'])) ? $bk_title['value'] : null;
+					$bk_release_date = (!empty($bk_release_date['is_display_index']) && !empty($bk_release_date['value'])) ? $bk_release_date['value'] : null;
+					$bk_size = (!empty($bk_size['is_display_index']) && !empty($bk_size['value'])) ? $bk_size['value'] : null;
+					$bk_page_num = (!empty($bk_page_num['is_display_index']) && !empty($bk_page_num['value'])) ? $bk_page_num['value'] : null;
+					$bk_description = (!empty($bk_description['is_display_index']) && !empty($bk_description['value'])) ? $bk_description['value'] : null;
+					$bk_note = (!empty($bk_note['is_display_index']) && !empty($bk_note['value'])) ? $bk_note['value'] : null;
+					$bk_price = (!empty($bk_price['is_display_index']) && !empty($bk_price['value'])) ? $bk_price['value'] : null;
+
+					$bk_spec_line = implode(', ', array_filter([$bk_title, $bk_release_date, $bk_size, $bk_page_num, $bk_description, $bk_note, $bk_price]));
 				?>
-				<a href="<?php echo esc_url(get_permalink($book->ID)); ?>" class="artfair-detail__books-item">
+				<a href="<?php echo esc_url(get_permalink($book->ID)); ?>" class="exhibition-detail__books-item">
 					<?php if ($bk_image) : ?>
-					<div class="artfair-detail__books-img">
+					<div class="exhibition-detail__books-img">
 						<img src="<?php echo esc_url($bk_image['url']); ?>" alt="<?php echo esc_attr($bk_image['alt']); ?>" loading="lazy">
 					</div>
 					<?php endif; ?>
-					<div class="artfair-detail__books-info">
-						<?php if (!empty($bk_artist['value'])) : ?>
-						<p class="artfair-detail__books-artist"><?php echo esc_html($bk_artist['value']); ?></p>
+					<div class="exhibition-detail__books-info">
+						<?php if ($bk_artist) : ?>
+						<p class="exhibition-detail__books-artist"><?php echo esc_html($bk_artist); ?></p>
 						<?php endif; ?>
-						<?php if (!empty($bk_title['value'])) : ?>
-						<p class="artfair-detail__books-spec"><?php echo esc_html($bk_title['value']); ?></p>
+						<?php if ($bk_spec_line) : ?>
+						<p class="exhibition-detail__books-spec"><?php echo esc_html($bk_spec_line); ?></p>
 						<?php endif; ?>
 					</div>
 				</a>
@@ -249,28 +341,31 @@
 		<?php $events_table = get_field('events_table'); ?>
 		<?php $events_note = get_field('events_note'); ?>
 		<?php if ($events) : ?>
-		<section class="artfair-detail__events">
-			<h3 class="artfair-detail__section-heading">Events</h3>
-			<div class="artfair-detail__events-body">
+		<section class="exhibition-detail__events">
+			<h3 class="exhibition-detail__section-heading">Events</h3>
+			<div class="exhibition-detail__events-body wysiwyg">
 				<?php echo wp_kses_post($events); ?>
 			</div>
 			<?php if ($events_table) : ?>
-			<div class="artfair-detail__event-detail">
-				<?php if ($events_table['title']) : ?>
-				<p class="artfair-detail__event-subtitle"><?php echo esc_html($events_table['title']); ?></p>
+			<div class="exhibition-detail__event-detail">
+				<?php if (!empty($events_table['title'])) : ?>
+				<p class="exhibition-detail__event-subtitle"><?php echo esc_html($events_table['title']); ?></p>
 				<?php endif; ?>
-				<ul class="artfair-detail__event-list">
-					<?php foreach ($events_table['table'] as $item) : ?>
-					<li class="artfair-detail__event-item">
-						<span class="artfair-detail__event-label"><?php echo esc_html($item['term']); ?></span>
-						<span class="artfair-detail__event-value"><?php echo esc_html($item['description']); ?></span>
+				<ul class="exhibition-detail__event-list">
+					<?php	$pairs = $events_table['rows'];	?>
+					<?php foreach ($pairs as $pair) : ?>
+						<?php if (!empty($pair['desc'])) : ?>
+					<li class="exhibition-detail__event-item">
+						<span class="exhibition-detail__event-label"><?php echo esc_html($pair['term']); ?></span>
+						<span class="exhibition-detail__event-value"><?php echo nl2br(esc_html($pair['desc'])); ?></span>
 					</li>
+						<?php endif; ?>
 					<?php endforeach; ?>
 				</ul>
 			</div>
 			<?php endif; ?>
 			<?php if ($events_note) : ?>
-			<div class="artfair-detail__event-notes"><?php echo wp_kses_post($events_note); ?></div>
+			<div class="exhibition-detail__event-notes"><?php echo wp_kses_post($events_note); ?></div>
 			<?php endif; ?>
 		</section>
 		<?php endif; ?>
@@ -278,32 +373,30 @@
 		<!-- ===== Section 12: ARTISTS ===== -->
 		<?php $artists = get_field('artists'); ?>
 		<?php if ($artists) : ?>
-		<section class="artfair-detail__artists">
-			<h3 class="artfair-detail__section-heading">Artists</h3>
-			<div class="artfair-detail__artists-list">
+		<section class="exhibition-detail__artists">
+			<h3 class="exhibition-detail__section-heading">Artists</h3>
+			<div class="exhibition-detail__artists-list">
 				<?php foreach ($artists as $artist) :
 					$ar_mv = get_field('mv_images', $artist->ID);
 					$ar_image = (!empty($ar_mv['pc'])) ? $ar_mv['pc'] : null;
 					$ar_overview = get_field('overview', $artist->ID);
-					$ar_name1 = !empty($ar_overview['name1']) ? $ar_overview['name1'] : '';
-					$ar_name2 = !empty($ar_overview['name2']) ? $ar_overview['name2'] : '';
+					$ar_name1 = $ar_overview['name1'] ?? get_the_title($artist->ID);
+					$ar_name2 = $ar_overview['name2'] ?? '';
 					$ar_description = $ar_overview['profile'] ?? '';
 				?>
-				<div class="artfair-detail__artist-item">
+				<div class="exhibition-detail__artist-item">
 					<?php if ($ar_image) : ?>
-					<div class="artfair-detail__artist-img">
+					<div class="exhibition-detail__artist-img">
 						<img src="<?php echo esc_url($ar_image['url']); ?>" alt="<?php echo esc_attr($ar_image['alt']); ?>" loading="lazy">
 					</div>
 					<?php endif; ?>
-					<div class="artfair-detail__artist-info">
-						<?php if ($ar_name1) : ?>
-						<p class="artfair-detail__artist-name"><?php echo esc_html($ar_name1); ?></p>
-						<?php endif; ?>
+					<div class="exhibition-detail__artist-info">
+						<p class="exhibition-detail__artist-name"><?php echo esc_html($ar_name1); ?></p>
 						<?php if ($ar_name2) : ?>
-						<p class="artfair-detail__artist-name-ja"><?php echo esc_html($ar_name2); ?></p>
+						<p class="exhibition-detail__artist-name-ja"><?php echo esc_html($ar_name2); ?></p>
 						<?php endif; ?>
 						<?php if ($ar_description) : ?>
-						<p class="artfair-detail__artist-bio"><?php echo esc_html($ar_description); ?></p>
+						<p class="exhibition-detail__artist-bio"><?php echo esc_html($ar_description); ?></p>
 						<?php endif; ?>
 						<a href="<?php echo esc_url(get_permalink($artist->ID)); ?>" class="u-link-more">Learn more</a>
 					</div>
@@ -316,18 +409,18 @@
 		<!-- ===== Section 13: INSTALLATION VIEWS ===== -->
 		<?php $installation_views = get_field('installation_views'); ?>
 		<?php if ($installation_views) : ?>
-		<section class="artfair-detail__installation">
-			<h3 class="artfair-detail__section-heading">Installation Views</h3>
-			<div class="artfair-detail__installation-nav">
-				<button class="artfair-detail__installation-prev js-installation-prev" aria-label="前の画像"></button>
-				<span class="artfair-detail__installation-counter">
+		<section class="exhibition-detail__installation">
+			<h3 class="exhibition-detail__section-heading">Installation Views</h3>
+			<div class="exhibition-detail__installation-nav">
+				<button class="exhibition-detail__installation-prev js-installation-prev" aria-label="前の画像"></button>
+				<span class="exhibition-detail__installation-counter">
 					<span class="js-installation-current">1</span>
-					<span class="artfair-detail__installation-separator">/</span>
+					<span class="exhibition-detail__installation-separator">/</span>
 					<span class="js-installation-total"><?php echo count($installation_views); ?></span>
 				</span>
-				<button class="artfair-detail__installation-next js-installation-next" aria-label="次の画像"></button>
+				<button class="exhibition-detail__installation-next js-installation-next" aria-label="次の画像"></button>
 			</div>
-			<div class="artfair-detail__installation-slider">
+			<div class="exhibition-detail__installation-slider">
 				<div class="swiper js-installation-swiper" id="installationSwiper">
 					<div class="swiper-wrapper">
 						<?php foreach ($installation_views as $index => $view) : ?>
@@ -351,33 +444,33 @@
 			$youtube_embed_url = 'https://www.youtube.com/embed/' . $matches[1];
 		}
 		?>
-		<section class="artfair-detail__film">
-			<div class="artfair-detail__film-header">
-				<h3 class="artfair-detail__section-heading">Film</h3>
+		<section class="exhibition-detail__film">
+			<div class="exhibition-detail__film-header">
+				<h3 class="exhibition-detail__section-heading">Film</h3>
 				<?php if (!empty($film['see_more_on_youtube_url'])) : ?>
-				<a href="<?php echo esc_url($film['see_more_on_youtube_url']); ?>" class="artfair-detail__film-link" target="_blank" rel="noopener noreferrer">
+				<a href="<?php echo esc_url($film['see_more_on_youtube_url']); ?>" class="exhibition-detail__film-link" target="_blank" rel="noopener noreferrer">
 					See more on Youtube
-					<svg class="artfair-detail__film-link-icon" width="24" height="24" viewBox="0 0 24 24"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8-8-8z" fill="currentColor"></path></svg>
+					<svg class="exhibition-detail__film-link-icon" width="24" height="24" viewBox="0 0 24 24"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8-8-8z" fill="currentColor"></path></svg>
 				</a>
 				<?php endif; ?>
 			</div>
 			<?php if ($youtube_embed_url) : ?>
-			<div class="artfair-detail__film-content">
-				<div class="artfair-detail__film-player">
-					<iframe src="<?php echo esc_url($youtube_embed_url); ?>" title="Art Fair Film" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+			<div class="exhibition-detail__film-content">
+				<div class="exhibition-detail__film-player">
+					<iframe src="<?php echo esc_url($youtube_embed_url); ?>" title="Exhibition Film" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
 				</div>
 				<?php if (!empty($film['caption'])) : ?>
-				<p class="artfair-detail__film-caption"><?php echo esc_html($film['caption']); ?></p>
+				<p class="exhibition-detail__film-caption"><?php echo esc_html($film['caption']); ?></p>
 				<?php endif; ?>
 			</div>
 			<?php endif; ?>
 			<?php if (!empty($film['event_title']) || !empty($film['event_description'])) : ?>
-			<div class="artfair-detail__film-body">
+			<div class="exhibition-detail__film-body">
 				<?php if (!empty($film['event_title'])) : ?>
-				<h4 class="artfair-detail__film-title"><?php echo esc_html($film['event_title']); ?></h4>
+				<h4 class="exhibition-detail__film-title"><?php echo esc_html($film['event_title']); ?></h4>
 				<?php endif; ?>
 				<?php if (!empty($film['event_description'])) : ?>
-				<p class="artfair-detail__film-text"><?php echo nl2br(esc_html($film['event_description'])); ?></p>
+				<p class="exhibition-detail__film-text"><?php echo nl2br(esc_html($film['event_description'])); ?></p>
 				<?php endif; ?>
 			</div>
 			<?php endif; ?>
@@ -387,20 +480,20 @@
 		<!-- ===== Section 15: PRODUCT ===== -->
 		<?php $product = get_field('product'); ?>
 		<?php if (!empty($product['image']) || !empty($product['description'])) : ?>
-		<section class="artfair-detail__product">
-			<h3 class="artfair-detail__section-heading">Product</h3>
+		<section class="exhibition-detail__product">
+			<h3 class="exhibition-detail__section-heading">Product</h3>
 			<?php if (!empty($product['image'])) : ?>
-			<div class="artfair-detail__product-content">
-				<div class="artfair-detail__product-img">
+			<div class="exhibition-detail__product-content">
+				<div class="exhibition-detail__product-img">
 					<img src="<?php echo esc_url($product['image']['url']); ?>" alt="<?php echo esc_attr($product['image']['alt']); ?>" loading="lazy">
 				</div>
 			</div>
 			<?php endif; ?>
 			<?php if (!empty($product['description'])) : ?>
-			<p class="artfair-detail__product-text"><?php echo nl2br(esc_html($product['description'])); ?></p>
+			<p class="exhibition-detail__product-text"><?php echo nl2br(esc_html($product['description'])); ?></p>
 			<?php endif; ?>
 			<?php if (!empty($product['shop_name']) && !empty($product['shop_url'])) : ?>
-			<p class="artfair-detail__product-shop">
+			<p class="exhibition-detail__product-shop">
 				<?php echo esc_html($product['shop_name']); ?> : <a href="<?php echo esc_url($product['shop_url']); ?>" target="_blank" rel="noopener noreferrer"><?php echo esc_html($product['shop_url']); ?></a>
 			</p>
 			<?php endif; ?>
@@ -418,7 +511,7 @@
 				var slideCount = installSlides.length;
 				var installTotal = document.querySelector('.js-installation-total');
 				var installCurrent = document.querySelector('.js-installation-current');
-				var installNav = document.querySelector('.artfair-detail__installation-nav');
+				var installNav = document.querySelector('.exhibition-detail__installation-nav');
 
 				if (slideCount <= 1) {
 					if (installNav) installNav.style.display = 'none';
@@ -468,35 +561,29 @@
 
 		});
 
-	// ----- View more (FEATURED WORKS) -----
-	const worksList = document.querySelector('.artfair-detail__works-grid');
-	const worksMoreWrap = document.getElementById('js-artfair-works-more');
+	// ----- View more (FEATURED WORKS: row ごとに独立) -----
+	document.querySelectorAll('.js-works-more').forEach(moreWrap => {
+		const row = moreWrap.previousElementSibling;
+		if (!row || !row.classList.contains('exhibition-detail__works-row')) return;
 
-	if (worksList && worksMoreWrap) {
-		const worksBtn = worksMoreWrap.querySelector('.u-button-more');
+		const moreBtn = moreWrap.querySelector('.u-button-more');
+		const colCount = parseInt(row.dataset.colCount, 10) || 3;
 
-		const getShowCount = (item) => {
-			const row = item.closest('.artfair-detail__works-row');
-			if (row?.classList.contains('artfair-detail__works-row--col1')) return 1;
-			if (row?.classList.contains('artfair-detail__works-row--col2')) return 2;
-			return 3;
-		};
-
-		const updateWorksMoreVisibility = () => {
-			const hiddenItems = worksList.querySelectorAll('.artfair-detail__work.is-hidden');
+		const updateMoreVisibility = () => {
+			const hiddenItems = row.querySelectorAll('.exhibition-detail__work.is-hidden');
 			if (hiddenItems.length === 0) {
-				worksMoreWrap.style.display = 'none';
+				moreWrap.style.display = 'none';
 			}
 		};
 
-		updateWorksMoreVisibility();
+		updateMoreVisibility();
 
-		if (worksBtn) {
-			worksBtn.addEventListener('click', () => {
-				const hiddenItems = worksList.querySelectorAll('.artfair-detail__work.is-hidden');
+		if (moreBtn) {
+			moreBtn.addEventListener('click', () => {
+				const hiddenItems = row.querySelectorAll('.exhibition-detail__work.is-hidden');
 				if (hiddenItems.length === 0) return;
 
-				const showCount = Math.min(getShowCount(hiddenItems[0]), hiddenItems.length);
+				const showCount = Math.min(colCount, hiddenItems.length);
 
 				for (let i = 0; i < showCount; i++) {
 					const item = hiddenItems[i];
@@ -508,10 +595,26 @@
 					}, { once: true });
 				}
 
-				updateWorksMoreVisibility();
+				updateMoreVisibility();
 			});
 		}
-	}
+	});
+
+	// ----- Statement / Contribution View more -----
+	document.querySelectorAll('.js-statement-toggle').forEach(function(toggle) {
+		var wrapper = toggle.closest('.exhibition-detail__statement-upper') || toggle.closest('.exhibition-detail__statement').querySelector('.exhibition-detail__statement-lower') ? toggle.parentElement.previousElementSibling : null;
+		var target = toggle.parentElement.previousElementSibling;
+		if (!target) return;
+
+		toggle.addEventListener('click', function() {
+			var isExtended = target.classList.toggle('is-extended');
+			toggle.classList.toggle('is-expanded', isExtended);
+			var label = toggle.querySelector('.artist-detail__overview-viewmore-label');
+			if (label) {
+				label.textContent = isExtended ? 'View less' : 'View more';
+			}
+		});
+	});
 	</script>
 
 <?php get_footer(); ?>
