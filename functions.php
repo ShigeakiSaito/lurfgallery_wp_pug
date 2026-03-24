@@ -340,6 +340,271 @@ function change_post_permalink( $permalink, $post ) {
 }
 add_filter( 'post_link', 'change_post_permalink', 10, 2 );
 
+// ─────────────────────────────────────────────────────────────
+// 投稿(news)スラッグ自動生成: yyyy-mm-dd-0001 形式
+// ─────────────────────────────────────────────────────────────
+// 連番はpost metaに保存し、削除しても欠番にする（詰めない）
+// カウンターは wp_options の 'news_seq_counter' で管理
+//
+// 【現在の仕様】公開日変更時、スラッグの日付部分も追従して変わる
+//
+// 【公開日を固定にする場合】
+// generate_news_slug() 内の $date 取得部分を以下に差し替え:
+//   $first_date = get_post_meta( $post_id, '_news_first_publish_date', true );
+//   if ( $first_date ) {
+//       $date = $first_date;
+//   } else {
+//       $date = substr( $post_date, 0, 10 );
+//       update_post_meta( $post_id, '_news_first_publish_date', $date );
+//   }
+// ─────────────────────────────────────────────────────────────
+
+/**
+ * 投稿に連番を割り当てる（未割り当ての場合のみ）
+ */
+function assign_news_seq_number( $post_id ) {
+    $seq = get_post_meta( $post_id, '_news_seq_number', true );
+    if ( $seq ) {
+        return (int) $seq;
+    }
+    $counter = (int) get_option( 'news_seq_counter', 0 );
+    $counter++;
+    update_option( 'news_seq_counter', $counter );
+    update_post_meta( $post_id, '_news_seq_number', $counter );
+    return $counter;
+}
+
+/**
+ * スラッグを生成: yyyy-mm-dd-0001
+ */
+function generate_news_slug( $post_id, $post_date ) {
+    $seq  = assign_news_seq_number( $post_id );
+    $date = substr( $post_date, 0, 10 ); // yyyy-mm-dd
+    return $date . '-' . str_pad( $seq, 4, '0', STR_PAD_LEFT );
+}
+
+/**
+ * 投稿保存時にスラッグを自動設定
+ */
+function auto_set_news_slug( $data, $postarr ) {
+    if ( $data['post_type'] !== 'post' ) {
+        return $data;
+    }
+    // 下書き・自動保存はスキップ
+    if ( $data['post_status'] === 'auto-draft' || defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+        return $data;
+    }
+    $post_id = $postarr['ID'] ?? 0;
+    // 新規投稿でIDがまだない場合はスキップ（wp_after_insert_post で処理）
+    if ( ! $post_id ) {
+        return $data;
+    }
+    $post_date          = $data['post_date'];
+    $data['post_name']  = generate_news_slug( $post_id, $post_date );
+    return $data;
+}
+add_filter( 'wp_insert_post_data', 'auto_set_news_slug', 10, 2 );
+
+/**
+ * 新規投稿作成後にスラッグを設定（初回保存時はIDがないため）
+ */
+function auto_set_news_slug_on_create( $post_id, $post, $update ) {
+    if ( $post->post_type !== 'post' || $update ) {
+        return;
+    }
+    if ( $post->post_status === 'auto-draft' ) {
+        return;
+    }
+    $slug = generate_news_slug( $post_id, $post->post_date );
+    if ( $post->post_name !== $slug ) {
+        remove_action( 'wp_after_insert_post', 'auto_set_news_slug_on_create', 10 );
+        wp_update_post( [
+            'ID'        => $post_id,
+            'post_name' => $slug,
+        ] );
+        add_action( 'wp_after_insert_post', 'auto_set_news_slug_on_create', 10, 3 );
+    }
+}
+add_action( 'wp_after_insert_post', 'auto_set_news_slug_on_create', 10, 3 );
+
+// 投稿(news)一覧にスラッグ列を追加
+function news_add_slug_column( $columns ) {
+    $new_columns = [];
+    foreach ( $columns as $key => $label ) {
+        $new_columns[ $key ] = $label;
+        if ( $key === 'title' ) {
+            $new_columns['news_slug'] = 'スラッグ';
+        }
+    }
+    return $new_columns;
+}
+add_filter( 'manage_posts_columns', 'news_add_slug_column' );
+
+function news_show_slug_column( $column, $post_id ) {
+    if ( $column === 'news_slug' ) {
+        $post = get_post( $post_id );
+        echo '<code>' . esc_html( $post->post_name ) . '</code>';
+    }
+}
+add_action( 'manage_posts_custom_column', 'news_show_slug_column', 10, 2 );
+
+// ─────────────────────────────────────────────────────────────
+// 投稿(news)スラッグ一括更新ツール
+// ─────────────────────────────────────────────────────────────
+// 管理画面「news > スラッグ一括更新」から実行可能
+// 公開日昇順で連番を0001から振り直し、カウンターもリセットする
+// ─────────────────────────────────────────────────────────────
+
+// function news_slug_reindex_menu() {
+//     add_submenu_page(
+//         'edit.php',            // 投稿(news)メニュー配下
+//         'スラッグ一括更新',
+//         'スラッグ一括更新',
+//         'manage_options',      // 管理者のみ
+//         'news-slug-reindex',
+//         'news_slug_reindex_page'
+//     );
+// }
+// add_action( 'admin_menu', 'news_slug_reindex_menu' );
+
+/*
+function news_slug_reindex_page() {
+    if ( ! current_user_can( 'manage_options' ) ) {
+        wp_die( '権限がありません。' );
+    }
+
+    $result_message = '';
+
+    // 実行処理
+    if ( isset( $_POST['do_reindex'] ) && check_admin_referer( 'news_slug_reindex_action' ) ) {
+        $result_message = news_slug_reindex_execute();
+    }
+
+    // プレビュー取得
+    $preview = news_slug_reindex_preview();
+
+    ?>
+    <div class="wrap">
+        <h1>News スラッグ一括更新</h1>
+        <p>すべての投稿(news)のスラッグを公開日昇順で <code>yyyy-mm-dd-0001</code> 形式に振り直します。</p>
+        <p><strong>注意:</strong> 既存のURLが変わるため、外部からのリンクが切れる可能性があります。</p>
+
+        <?php if ( $result_message ) : ?>
+            <div class="notice notice-success is-dismissible">
+                <p><?php echo esc_html( $result_message ); ?></p>
+            </div>
+        <?php endif; ?>
+
+        <h2>プレビュー</h2>
+        <?php if ( empty( $preview ) ) : ?>
+            <p>対象の投稿がありません。</p>
+        <?php else : ?>
+            <table class="widefat fixed striped">
+                <thead>
+                    <tr>
+                        <th style="width:40px;">No.</th>
+                        <th>タイトル</th>
+                        <th>公開日</th>
+                        <th>現在のスラッグ</th>
+                        <th>更新後のスラッグ</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ( $preview as $i => $item ) : ?>
+                        <tr>
+                            <td><?php echo esc_html( $i + 1 ); ?></td>
+                            <td><?php echo esc_html( $item['title'] ); ?></td>
+                            <td><?php echo esc_html( $item['date'] ); ?></td>
+                            <td><code><?php echo esc_html( $item['current_slug'] ); ?></code></td>
+                            <td><code><?php echo esc_html( $item['new_slug'] ); ?></code></td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+
+            <form method="post" style="margin-top: 20px;">
+                <?php wp_nonce_field( 'news_slug_reindex_action' ); ?>
+                <input type="hidden" name="do_reindex" value="1">
+                <?php submit_button( 'スラッグを一括更新する', 'primary', 'submit', false ); ?>
+            </form>
+        <?php endif; ?>
+    </div>
+    <?php
+}
+// */
+
+/**
+ * プレビュー: 更新前後のスラッグ一覧を返す
+ */
+/*
+function news_slug_reindex_preview() {
+    $posts = get_posts( [
+        'post_type'      => 'post',
+        'post_status'    => [ 'publish', 'draft', 'pending', 'future', 'private' ],
+        'orderby'        => 'date',
+        'order'          => 'ASC',
+        'posts_per_page' => -1,
+    ] );
+
+    $preview = [];
+    foreach ( $posts as $seq => $post ) {
+        $seq_num  = $seq + 1;
+        $date     = substr( $post->post_date, 0, 10 );
+        $new_slug = $date . '-' . str_pad( $seq_num, 4, '0', STR_PAD_LEFT );
+
+        $preview[] = [
+            'title'        => $post->post_title,
+            'date'         => $date,
+            'current_slug' => $post->post_name,
+            'new_slug'     => $new_slug,
+        ];
+    }
+    return $preview;
+}
+//*/
+
+/**
+ * 実行: 連番リセット＆スラッグ一括更新
+ */
+/*
+function news_slug_reindex_execute() {
+    $posts = get_posts( [
+        'post_type'      => 'post',
+        'post_status'    => [ 'publish', 'draft', 'pending', 'future', 'private' ],
+        'orderby'        => 'date',
+        'order'          => 'ASC',
+        'posts_per_page' => -1,
+    ] );
+
+    // auto_set_news_slug が二重処理しないよう一時的に解除
+    remove_filter( 'wp_insert_post_data', 'auto_set_news_slug', 10 );
+    remove_action( 'wp_after_insert_post', 'auto_set_news_slug_on_create', 10 );
+
+    $count = 0;
+    foreach ( $posts as $seq => $post ) {
+        $seq_num  = $seq + 1;
+        $date     = substr( $post->post_date, 0, 10 );
+        $new_slug = $date . '-' . str_pad( $seq_num, 4, '0', STR_PAD_LEFT );
+
+        update_post_meta( $post->ID, '_news_seq_number', $seq_num );
+        wp_update_post( [
+            'ID'        => $post->ID,
+            'post_name' => $new_slug,
+        ] );
+        $count++;
+    }
+
+    // カウンターを更新（最後の連番 = 投稿数）
+    update_option( 'news_seq_counter', $count );
+
+    // フック再登録
+    add_filter( 'wp_insert_post_data', 'auto_set_news_slug', 10, 2 );
+    add_action( 'wp_after_insert_post', 'auto_set_news_slug_on_create', 10, 3 );
+
+    return $count . '件の投稿のスラッグを更新しました。';
+}
+//*/
+
 // メニュー位置変更
 function custom_admin_menu_order() {
     global $menu;
