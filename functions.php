@@ -332,7 +332,12 @@ function register_news_rewrite_rules() {
 }
 add_action( 'init', 'register_news_rewrite_rules' );
 
+// フロントエンドではカスタムパーマリンクを返す
+// 管理画面・REST APIではフィルターを適用せず、ブロックエディタのURLパネルを表示させる
 function change_post_permalink( $permalink, $post ) {
+    if ( is_admin() || ( defined( 'REST_REQUEST' ) && REST_REQUEST ) ) {
+        return $permalink;
+    }
     if ( $post->post_type === 'post' ) {
         return home_url( '/news/' . $post->post_name . '/' );
     }
@@ -341,22 +346,12 @@ function change_post_permalink( $permalink, $post ) {
 add_filter( 'post_link', 'change_post_permalink', 10, 2 );
 
 // ─────────────────────────────────────────────────────────────
-// 投稿(news)スラッグ自動生成: yyyy-mm-dd-0001 形式
+// 投稿(news)スラッグ自動生成: 0001 または 0001-xxx 形式
 // ─────────────────────────────────────────────────────────────
 // 連番はpost metaに保存し、削除しても欠番にする（詰めない）
 // カウンターは wp_options の 'news_seq_counter' で管理
-//
-// 【現在の仕様】公開日変更時、スラッグの日付部分も追従して変わる
-//
-// 【公開日を固定にする場合】
-// generate_news_slug() 内の $date 取得部分を以下に差し替え:
-//   $first_date = get_post_meta( $post_id, '_news_first_publish_date', true );
-//   if ( $first_date ) {
-//       $date = $first_date;
-//   } else {
-//       $date = substr( $post_date, 0, 10 );
-//       update_post_meta( $post_id, '_news_first_publish_date', $date );
-//   }
+// 新規作成時: ユーザー入力があれば 0001-xxx、なければ 0001
+// 編集時: 連番部分(0001-)は維持し、後半のみ変更可能
 // ─────────────────────────────────────────────────────────────
 
 /**
@@ -375,32 +370,57 @@ function assign_news_seq_number( $post_id ) {
 }
 
 /**
- * スラッグを生成: yyyy-mm-dd-0001
+ * 連番プレフィックスを取得: 0001
  */
-function generate_news_slug( $post_id, $post_date ) {
-    $seq  = assign_news_seq_number( $post_id );
-    $date = substr( $post_date, 0, 10 ); // yyyy-mm-dd
-    return $date . '-' . str_pad( $seq, 4, '0', STR_PAD_LEFT );
+function get_news_seq_prefix( $post_id ) {
+    $seq = assign_news_seq_number( $post_id );
+    return str_pad( $seq, 4, '0', STR_PAD_LEFT );
 }
 
 /**
- * 投稿保存時にスラッグを自動設定
+ * スラッグから連番プレフィックスを除去して後半部分を取得
+ */
+function strip_news_seq_prefix( $slug ) {
+    // 0001 または 0001-xxx 形式から後半を取得
+    if ( preg_match( '/^\d{4}(?:-(.+))?$/', $slug, $matches ) ) {
+        return $matches[1] ?? '';
+    }
+    return $slug;
+}
+
+/**
+ * 連番プレフィックス付きスラッグを生成
+ */
+function build_news_slug( $prefix, $suffix ) {
+    $suffix = sanitize_title( $suffix );
+    if ( $suffix === '' ) {
+        return $prefix;
+    }
+    return $prefix . '-' . $suffix;
+}
+
+/**
+ * 投稿保存時にスラッグに連番プレフィックスを付与
  */
 function auto_set_news_slug( $data, $postarr ) {
     if ( $data['post_type'] !== 'post' ) {
         return $data;
     }
-    // 下書き・自動保存はスキップ
     if ( $data['post_status'] === 'auto-draft' || defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
         return $data;
     }
     $post_id = $postarr['ID'] ?? 0;
-    // 新規投稿でIDがまだない場合はスキップ（wp_after_insert_post で処理）
     if ( ! $post_id ) {
         return $data;
     }
-    $post_date          = $data['post_date'];
-    $data['post_name']  = generate_news_slug( $post_id, $post_date );
+
+    $prefix       = get_news_seq_prefix( $post_id );
+    $current_slug = $data['post_name'];
+
+    // ユーザー入力のスラッグから連番プレフィックスを除去して後半を取得
+    $suffix = strip_news_seq_prefix( $current_slug );
+
+    $data['post_name'] = build_news_slug( $prefix, $suffix );
     return $data;
 }
 add_filter( 'wp_insert_post_data', 'auto_set_news_slug', 10, 2 );
@@ -415,7 +435,9 @@ function auto_set_news_slug_on_create( $post_id, $post, $update ) {
     if ( $post->post_status === 'auto-draft' ) {
         return;
     }
-    $slug = generate_news_slug( $post_id, $post->post_date );
+    $prefix = get_news_seq_prefix( $post_id );
+    $suffix = strip_news_seq_prefix( $post->post_name );
+    $slug   = build_news_slug( $prefix, $suffix );
     if ( $post->post_name !== $slug ) {
         remove_action( 'wp_after_insert_post', 'auto_set_news_slug_on_create', 10 );
         wp_update_post( [
@@ -549,12 +571,11 @@ function news_slug_reindex_preview() {
     $preview = [];
     foreach ( $posts as $seq => $post ) {
         $seq_num  = $seq + 1;
-        $date     = substr( $post->post_date, 0, 10 );
-        $new_slug = $date . '-' . str_pad( $seq_num, 4, '0', STR_PAD_LEFT );
+        $new_slug = str_pad( $seq_num, 4, '0', STR_PAD_LEFT );
 
         $preview[] = [
             'title'        => $post->post_title,
-            'date'         => $date,
+            'date'         => substr( $post->post_date, 0, 10 ),
             'current_slug' => $post->post_name,
             'new_slug'     => $new_slug,
         ];
@@ -583,8 +604,7 @@ function news_slug_reindex_execute() {
     $count = 0;
     foreach ( $posts as $seq => $post ) {
         $seq_num  = $seq + 1;
-        $date     = substr( $post->post_date, 0, 10 );
-        $new_slug = $date . '-' . str_pad( $seq_num, 4, '0', STR_PAD_LEFT );
+        $new_slug = str_pad( $seq_num, 4, '0', STR_PAD_LEFT );
 
         update_post_meta( $post->ID, '_news_seq_number', $seq_num );
         wp_update_post( [
