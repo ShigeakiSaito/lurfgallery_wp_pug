@@ -330,7 +330,8 @@ $artworks_initial_rows = 5; // PC版で表示する行数
 								$artist_names = [];
 								foreach ($exh_artists as $artist) {
 									if (is_object($artist)) {
-										$artist_names[] = get_field('overview', $artist->ID)['name2'] ?? get_the_title($artist->ID);
+										$artist_overview = get_field('overview', $artist->ID);
+										$artist_names[] = $artist_overview ? $artist_overview['name2'] ?? get_the_title($artist->ID) : get_the_title($artist->ID);
 									}
 								}
 								$exh_artist_text = implode('✕', $artist_names);
