@@ -114,10 +114,10 @@
 		<?php $contribution = ''; ?>
 		<?php if ($statement_contribution) : ?>
 			<?php 
-				$statement = $statement_contribution['statement']; 
-				$contribution = $statement_contribution['contribution']; 
-				$line_num_pc = $statement_contribution['line_num_pc'] ?: 99;
-				$line_num_sp = $statement_contribution['line_num_sp'] ?: 99;
+				$statement = $statement_contribution['statement'] ?? ''; 
+				$contribution = $statement_contribution['contribution'] ?? ''; 
+				$line_num_pc = $statement_contribution['line_num_pc'] ?? 99;
+				$line_num_sp = $statement_contribution['line_num_sp'] ?? 99;
 			?>
 		<?php endif; ?>
 		<?php if ($statement || $contribution) : ?>
