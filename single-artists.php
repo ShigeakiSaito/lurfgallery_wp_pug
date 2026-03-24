@@ -213,7 +213,7 @@ $artworks_initial_rows = 5; // PC版で表示する行数
 					<a href="<?php echo esc_url(get_permalink($artwork_id)); ?>" class="artist-detail__artwork<?php echo $hidden_class; ?>">
 						<div class="artist-detail__artwork-img">
 							<?php if ($artwork_thumb) : ?>
-							<img src="<?php echo esc_url($artwork_thumb); ?>" alt="<?php echo esc_attr($title_text); ?>" loading="lazy">
+							<img src="<?php echo esc_url($artwork_thumb); ?>" alt="<?php echo esc_attr($artwork_title); ?>" loading="lazy">
 							<?php else : ?>
 							<img src="<?php echo $noimage; ?>" alt="" loading="lazy">
 							<?php endif; ?>
