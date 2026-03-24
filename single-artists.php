@@ -22,10 +22,10 @@ $artworks_initial_rows = 5; // PC版で表示する行数
 
 		<!-- ===== Section 01: MV ===== -->
 		<section class="artist-detail__mv">
-			<?php if ($mv_images['pc']) : ?>
+			<?php if ($mv_images['pc'] ?? null) : ?>
 			<div class="artist-detail__mv-bg u-pc" style="background-image: url('<?php echo esc_url($mv_images['pc']['url'] ?? ''); ?>'); }"></div>
 			<?php endif; ?>
-			<?php if ($mv_images['sp']) : ?>
+			<?php if ($mv_images['sp'] ?? null) : ?>
 			<div class="artist-detail__mv-bg u-sp" style="background-image: url('<?php echo esc_url($mv_images['sp']['url'] ?? ''); ?>'); }"></div>
 			<?php endif; ?>
 			<div class="artist-detail__mv-overlay"></div>
@@ -204,7 +204,7 @@ $artworks_initial_rows = 5; // PC版で表示する行数
 						$artwork_description = (!empty($artwork_description['is_display_index']) && !empty($artwork_description['value'])) ? $artwork_description['value'] : '';
 						$artwork_note = (!empty($artwork_note['is_display_index']) && !empty($artwork_note['value'])) ? $artwork_note['value'] : '';
 
-						$artist_text = $artwork_artist['value'] ?? '';
+						$artist_text = is_array($artwork_artist) ? ($artwork_artist['value'] ?? '') : '';
 						$spec_text = implode(', ', array_filter([$artwork_title, $artwork_year, $artwork_material, $artwork_size, $artwork_description, $artwork_note]));
 
 						// 初期表示件数を超えたら is-hidden を付与
@@ -213,7 +213,7 @@ $artworks_initial_rows = 5; // PC版で表示する行数
 					<a href="<?php echo esc_url(get_permalink($artwork_id)); ?>" class="artist-detail__artwork<?php echo $hidden_class; ?>">
 						<div class="artist-detail__artwork-img">
 							<?php if ($artwork_thumb) : ?>
-							<img src="<?php echo esc_url($artwork_thumb); ?>" alt="<?php echo esc_attr($title_text); ?>" loading="lazy">
+							<img src="<?php echo esc_url($artwork_thumb); ?>" alt="<?php echo esc_attr($artwork_title); ?>" loading="lazy">
 							<?php else : ?>
 							<img src="<?php echo $noimage; ?>" alt="" loading="lazy">
 							<?php endif; ?>
@@ -330,7 +330,8 @@ $artworks_initial_rows = 5; // PC版で表示する行数
 								$artist_names = [];
 								foreach ($exh_artists as $artist) {
 									if (is_object($artist)) {
-										$artist_names[] = get_field('overview', $artist->ID)['name2'] ?? get_the_title($artist->ID);
+										$artist_overview = get_field('overview', $artist->ID);
+										$artist_names[] = $artist_overview ? $artist_overview['name2'] ?? get_the_title($artist->ID) : get_the_title($artist->ID);
 									}
 								}
 								$exh_artist_text = implode('✕', $artist_names);

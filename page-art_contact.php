@@ -43,7 +43,7 @@ $artwork_info_text = implode(' / ', $artwork_info_parts);
 						<p class="contact__artwork-info-heading">お問い合わせ作品</p>
 						<?php if ($artwork_image) : ?>
 						<div class="contact__artwork-info">
-							<img src="<?php echo $artwork_image; ?>" alt="<?php echo $artwork_artist; ?>" loading="lazy">
+							<img src="<?php echo esc_url($artwork_image); ?>" alt="<?php echo $artwork_artist; ?>" loading="lazy">
 						</div>
 						<?php endif; ?>
 						<p class="contact__artwork-info"><?php echo $artwork_info_text; ?></p>
