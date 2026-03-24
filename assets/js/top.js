@@ -68,9 +68,9 @@ window.addEventListener('load', () => {
   // news swiper 
   const swiperEl = document.querySelector('#topNewsSwiper');
   const controller = document.querySelector('.top__newslist .swiper-controller-wrapper');
-  const slideCount = swiperEl.querySelectorAll('#topNewsSwiper .swiper-slide').length;
+  const slideCountN = swiperEl.querySelectorAll('#topNewsSwiper .swiper-slide').length;
 
-  if (slideCount === 0) {
+  if (slideCountN === 0) {
     swiperEl.innerHTML = '<p class="top__notice">There are currently no news updates.</p>';
     
     if (controller) {
@@ -79,13 +79,13 @@ window.addEventListener('load', () => {
 
   } else {
     const topNewsSwiper = new Swiper('#topNewsSwiper', {
-      loop: slideCount > 1,
+      loop: slideCountN > 1,
       speed: 800,
-      pagination: slideCount > 1 ? {
+      pagination: slideCountN > 1 ? {
         el: '.news-pagination',
         type: 'fraction',
       } : false,
-      navigation: slideCount > 1 ? {
+      navigation: slideCountN > 1 ? {
         nextEl: '.news-button-next',
         prevEl: '.news-button-prev',
       } : false,
