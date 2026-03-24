@@ -4,27 +4,36 @@ window.addEventListener('load', () => {
   const progressWrapper = document.querySelector('.mv-progressbars');
   const controllerWrapper = document.querySelector('.top__mv .swiper-controller-wrapper');
 
-  // 複製スライドを除いた実質的な枚数
-  const slides = document.querySelectorAll(
-    '#topMvSwiper .swiper-slide:not(.swiper-slide-duplicate)'
-  );
+  // 実スライドの枚数
+  const swiperWrapper = document.querySelector('#topMvSwiper .swiper-wrapper');
+  const slides = swiperWrapper
+    ? swiperWrapper.querySelectorAll(':scope > .swiper-slide')
+    : [];
+  const slideCount = slides.length;
 
   // --- ここから枚数判定 ---
-  if (slides.length <= 1) {
+  if (slideCount <= 1) {
     // 1枚以下の時の処理
     if (controllerWrapper) controllerWrapper.style.display = 'none';
     if (mvContainer) mvContainer.classList.add('is-single');
-    
+
   } else {
-    // 2枚以上ある時のみ、今までの処理を実行
+    // Swiper 12のloop modeは最低3枚必要なため、2枚の場合はDOMを複製
+    if (slideCount === 2) {
+      slides.forEach((slide) => {
+        swiperWrapper.appendChild(slide.cloneNode(true));
+      });
+    }
+
+    // プログレスバー生成（実スライド枚数分）
     progressWrapper.innerHTML = '';
-    slides.forEach(() => {
+    for (let i = 0; i < slideCount; i++) {
       const bar = document.createElement('div');
       bar.className = 'mv-progressbar';
       const span = document.createElement('span');
       bar.appendChild(span);
       progressWrapper.appendChild(bar);
-    });
+    }
 
     const progressBars = progressWrapper.querySelectorAll('.mv-progressbar span');
 
@@ -41,7 +50,7 @@ window.addEventListener('load', () => {
       },
       on: {
         autoplayTimeLeft(swiper, time, progress) {
-          const active = swiper.realIndex;
+          const active = swiper.realIndex % slideCount;
           progressBars.forEach((bar, i) => {
             if (i < active) {
               bar.style.width = '100%';
