@@ -5,38 +5,51 @@ get_header();
 
 <main class="top">
     <h1>LURF GALLERY</h1>
-    <!-- phase1用MV -->    
+    <?php $mv_type = get_field('mv_type'); ?>
+    <?php if ( $mv_type === 'video' ) : ?>
+    <!-- MV: video -->
     <div class="top__mv">
-        <?php $upload_dir = wp_get_upload_dir(); ?>
-        <a href="<?php echo esc_url( home_url( '/exhibitions/group-exhibition-imagination/' ) ); ?>">
-            <video autoplay muted loop playsinline preload="metadata" class="only-pc">
-                <source src="<?php echo esc_url($upload_dir['baseurl'] . '/2026/02/img_mv_pc.mp4'); ?>">
-            </video>
-            <video autoplay muted loop playsinline preload="metadata" class="only-sp">
-                <source src="<?php echo esc_url($upload_dir['baseurl'] . '/2026/02/img_mv_sp.mp4'); ?>">
-            </video>
-        </a>
+        <?php $mv_url = get_field('url'); ?>
+        <?php if ( $mv_url ) : ?><a href="<?php echo esc_url( $mv_url ); ?>"><?php endif; ?>
+        <?php
+            $video_pc = get_field('mv_video_pc');
+            $video_sp = get_field('mv_video_sp') ?: $video_pc;
+        ?>
+        <video autoplay muted loop playsinline>
+            <source src="<?php echo esc_url( $video_pc ); ?>" media="(min-width: 768px)">
+            <source src="<?php echo esc_url( $video_sp ); ?>">
+        </video>
+        <?php if ( $mv_url ) : ?></a><?php endif; ?>
     </div>
-    <!-- phase2用MV -->
-    <!-- <div class="top__mv">
+    <?php else : ?>
+    <!-- MV: image slider -->
+    <?php $mv_slides = get_field('mv'); ?>
+    <div class="top__mv">
         <div class="swiper" id="topMvSwiper">
             <div class="swiper-wrapper">
-                <div class="swiper-slide">
-                    <a href="">
+                <?php foreach ( $mv_slides as $slide ) : ?>
+                <?php
+                    $has_url     = ! empty( $slide['url'] );
+                    $overlay_class = 'mv-swiper__overlay';
+                    if ( $slide['text_color'] === 'black' ) {
+                        $overlay_class .= ' mv-swiper__overlay--black';
+                    }
+                ?>
+                <?php if ( $has_url ) : ?><a href="<?php echo esc_url( $slide['url'] ); ?>" class="swiper-slide"><?php else : ?><div class="swiper-slide"><?php endif; ?>
+                    <?php $img_sp = ! empty( $slide['mv_img_sp'] ) ? $slide['mv_img_sp'] : $slide['mv_img_pc']; ?>
                     <picture>
-                        <source srcset="<?php echo esc_url(get_template_directory_uri() . '/assets/img/top/img_exhibition01.png'); ?>" media="(min-width: 768px)" width="3024" height="1504">
-                        <img src="<?php echo esc_url(get_template_directory_uri() . '/assets/img/top/img_exhibition01.png'); ?>" alt="" width="780" height="1016">
-                    </picture>  
-                    </a>
-                </div>
-                <div class="swiper-slide">
-                    <a href="">
-                    <picture>
-                        <source srcset="<?php echo esc_url(get_template_directory_uri() . '/assets/img/top/img_exhibition02.png'); ?>" media="(min-width: 768px)" width="3024" height="1504">
-                        <img src="<?php echo esc_url(get_template_directory_uri() . '/assets/img/top/img_exhibition02.png'); ?>" alt="" width="780" height="1016">
-                    </picture>  
-                    </a>
-                </div>
+                        <source srcset="<?php echo esc_url( $slide['mv_img_pc'] ); ?>" media="(min-width: 768px)">
+                        <img src="<?php echo esc_url( $img_sp ); ?>" alt="">
+                    </picture>
+                    <div class="<?php echo esc_attr( $overlay_class ); ?>">
+                        <?php if ( $slide['text1'] ) : ?><p class="mv-swiper__title"><?php echo nl2br( esc_html( $slide['text1'] ) ); ?></p><?php endif; ?>
+                        <?php if ( $slide['text2'] ) : ?><p class="mv-swiper__subtitle"><?php echo nl2br( esc_html( $slide['text2'] ) ); ?></p><?php endif; ?>
+                        <?php if ( $slide['text3'] ) : ?><p class="mv-swiper__period"><?php echo nl2br( esc_html( $slide['text3'] ) ); ?></p><?php endif; ?>
+                        <?php if ( $slide['text4'] ) : ?><p class="mv-swiper__text4"><?php echo nl2br( esc_html( $slide['text4'] ) ); ?></p><?php endif; ?>
+                        <?php if ( $has_url ) : ?><span class="mv-swiper__btn">EXPLORE NOW</span><?php endif; ?>
+                    </div>
+                <?php if ( $has_url ) : ?></a><?php else : ?></div><?php endif; ?>
+                <?php endforeach; ?>
             </div>
         </div>
         <div class="swiper-controller-wrapper">
@@ -44,7 +57,8 @@ get_header();
             <div class="mv-progressbars"></div>
             <div class="swiper-button-next mv-button-next"></div>
         </div>
-    </div> -->
+    </div>
+    <?php endif; ?>
     <!-- exhibitions: current -->
     <?php
     $current_exh_query = new WP_Query(array(
