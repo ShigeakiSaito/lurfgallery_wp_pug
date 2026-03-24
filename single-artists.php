@@ -204,7 +204,7 @@ $artworks_initial_rows = 5; // PC版で表示する行数
 						$artwork_description = (!empty($artwork_description['is_display_index']) && !empty($artwork_description['value'])) ? $artwork_description['value'] : '';
 						$artwork_note = (!empty($artwork_note['is_display_index']) && !empty($artwork_note['value'])) ? $artwork_note['value'] : '';
 
-						$artist_text = $artwork_artist['value'] ?? '';
+						$artist_text = is_array($artwork_artist) ? ($artwork_artist['value'] ?? '') : '';
 						$spec_text = implode(', ', array_filter([$artwork_title, $artwork_year, $artwork_material, $artwork_size, $artwork_description, $artwork_note]));
 
 						// 初期表示件数を超えたら is-hidden を付与
