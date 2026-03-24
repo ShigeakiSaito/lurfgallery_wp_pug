@@ -110,6 +110,8 @@
 
 		<!-- ===== Section 06: ステートメント / 寄稿文 ===== -->
 		<?php $statement_contribution = get_field('statement_contribution'); ?>
+		<?php $statement = ''; ?>
+		<?php $contribution = ''; ?>
 		<?php if ($statement_contribution) : ?>
 			<?php 
 				$statement = $statement_contribution['statement']; 

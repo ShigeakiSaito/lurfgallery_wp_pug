@@ -22,10 +22,10 @@ $artworks_initial_rows = 5; // PC版で表示する行数
 
 		<!-- ===== Section 01: MV ===== -->
 		<section class="artist-detail__mv">
-			<?php if ($mv_images['pc']) : ?>
+			<?php if ($mv_images['pc'] ?? null) : ?>
 			<div class="artist-detail__mv-bg u-pc" style="background-image: url('<?php echo esc_url($mv_images['pc']['url'] ?? ''); ?>'); }"></div>
 			<?php endif; ?>
-			<?php if ($mv_images['sp']) : ?>
+			<?php if ($mv_images['sp'] ?? null) : ?>
 			<div class="artist-detail__mv-bg u-sp" style="background-image: url('<?php echo esc_url($mv_images['sp']['url'] ?? ''); ?>'); }"></div>
 			<?php endif; ?>
 			<div class="artist-detail__mv-overlay"></div>
