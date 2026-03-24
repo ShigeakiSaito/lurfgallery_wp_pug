@@ -73,7 +73,7 @@
 					<?php endif; ?>
 					<?php $price = get_field('price'); ?>
 					<?php if (!empty($price['is_display_detail']) && !empty($price['value'])) : ?>
-					<p class="books-detail__price"><?php echo esc_html(number_format((int) $price['value'])); ?> yen</p>
+					<p class="books-detail__price">￥<?php echo esc_html(number_format((int) $price['value'])); ?> <span class="books-detail__tax">(税込)</span></p>
 					<?php endif; ?>
 					<?php $buttons = get_field('buttons'); ?>
 					<?php if (!empty($buttons['contact']) || !empty($buttons['purchase'])) : ?>
