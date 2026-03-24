@@ -332,7 +332,12 @@ function register_news_rewrite_rules() {
 }
 add_action( 'init', 'register_news_rewrite_rules' );
 
+// フロントエンドではカスタムパーマリンクを返す
+// 管理画面・REST APIではフィルターを適用せず、ブロックエディタのURLパネルを表示させる
 function change_post_permalink( $permalink, $post ) {
+    if ( is_admin() || ( defined( 'REST_REQUEST' ) && REST_REQUEST ) ) {
+        return $permalink;
+    }
     if ( $post->post_type === 'post' ) {
         return home_url( '/news/' . $post->post_name . '/' );
     }
@@ -341,11 +346,12 @@ function change_post_permalink( $permalink, $post ) {
 add_filter( 'post_link', 'change_post_permalink', 10, 2 );
 
 // ─────────────────────────────────────────────────────────────
-// 投稿(news)スラッグ自動生成: 0001 形式（4桁連番）
+// 投稿(news)スラッグ自動生成: 0001 または 0001-xxx 形式
 // ─────────────────────────────────────────────────────────────
 // 連番はpost metaに保存し、削除しても欠番にする（詰めない）
 // カウンターは wp_options の 'news_seq_counter' で管理
-// URLは /news/0001 の形式
+// 新規作成時: ユーザー入力があれば 0001-xxx、なければ 0001
+// 編集時: 連番部分(0001-)は維持し、後半のみ変更可能
 // ─────────────────────────────────────────────────────────────
 
 /**
@@ -364,34 +370,57 @@ function assign_news_seq_number( $post_id ) {
 }
 
 /**
- * スラッグを生成: 0001
+ * 連番プレフィックスを取得: 0001
  */
-function generate_news_slug( $post_id ) {
+function get_news_seq_prefix( $post_id ) {
     $seq = assign_news_seq_number( $post_id );
     return str_pad( $seq, 4, '0', STR_PAD_LEFT );
 }
 
 /**
- * 投稿保存時にスラッグを自動設定（初回のみ、以降は手動編集可能）
+ * スラッグから連番プレフィックスを除去して後半部分を取得
+ */
+function strip_news_seq_prefix( $slug ) {
+    // 0001 または 0001-xxx 形式から後半を取得
+    if ( preg_match( '/^\d{4}(?:-(.+))?$/', $slug, $matches ) ) {
+        return $matches[1] ?? '';
+    }
+    return $slug;
+}
+
+/**
+ * 連番プレフィックス付きスラッグを生成
+ */
+function build_news_slug( $prefix, $suffix ) {
+    $suffix = sanitize_title( $suffix );
+    if ( $suffix === '' ) {
+        return $prefix;
+    }
+    return $prefix . '-' . $suffix;
+}
+
+/**
+ * 投稿保存時にスラッグに連番プレフィックスを付与
  */
 function auto_set_news_slug( $data, $postarr ) {
     if ( $data['post_type'] !== 'post' ) {
         return $data;
     }
-    // 下書き・自動保存はスキップ
     if ( $data['post_status'] === 'auto-draft' || defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
         return $data;
     }
     $post_id = $postarr['ID'] ?? 0;
-    // 新規投稿でIDがまだない場合はスキップ（wp_after_insert_post で処理）
     if ( ! $post_id ) {
         return $data;
     }
-    // 連番が未割り当ての場合のみ自動設定（以降はユーザーが編集可能）
-    $seq = get_post_meta( $post_id, '_news_seq_number', true );
-    if ( ! $seq ) {
-        $data['post_name'] = generate_news_slug( $post_id );
-    }
+
+    $prefix       = get_news_seq_prefix( $post_id );
+    $current_slug = $data['post_name'];
+
+    // ユーザー入力のスラッグから連番プレフィックスを除去して後半を取得
+    $suffix = strip_news_seq_prefix( $current_slug );
+
+    $data['post_name'] = build_news_slug( $prefix, $suffix );
     return $data;
 }
 add_filter( 'wp_insert_post_data', 'auto_set_news_slug', 10, 2 );
@@ -406,7 +435,9 @@ function auto_set_news_slug_on_create( $post_id, $post, $update ) {
     if ( $post->post_status === 'auto-draft' ) {
         return;
     }
-    $slug = generate_news_slug( $post_id );
+    $prefix = get_news_seq_prefix( $post_id );
+    $suffix = strip_news_seq_prefix( $post->post_name );
+    $slug   = build_news_slug( $prefix, $suffix );
     if ( $post->post_name !== $slug ) {
         remove_action( 'wp_after_insert_post', 'auto_set_news_slug_on_create', 10 );
         wp_update_post( [
