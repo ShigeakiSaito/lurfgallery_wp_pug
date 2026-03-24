@@ -16,8 +16,10 @@ get_header();
             $v_pc    = get_field('mv_video_pc');
             $v_sp    = get_field('mv_video_sp');
 
-            $pc_src = $pc_id ? wp_get_attachment_image_src($pc_id, 'full')[0] : '';
-            $sp_src = $sp_id ? wp_get_attachment_image_src($sp_id, 'full')[0] : $pc_src;
+            $pc_img = $pc_id ? wp_get_attachment_image_src($pc_id, 'full') : false;
+            $pc_src = $pc_img ? $pc_img[0] : '';
+            $sp_img = $sp_id ? wp_get_attachment_image_src($sp_id, 'full') : false;
+            $sp_src = $sp_img ? $sp_img[0] : $pc_src;
             if (!$pc_src) { $pc_src = $sp_src; }
             ?>
 
