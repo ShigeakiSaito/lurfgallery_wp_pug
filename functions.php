@@ -341,22 +341,11 @@ function change_post_permalink( $permalink, $post ) {
 add_filter( 'post_link', 'change_post_permalink', 10, 2 );
 
 // ─────────────────────────────────────────────────────────────
-// 投稿(news)スラッグ自動生成: yyyy-mm-dd-0001 形式
+// 投稿(news)スラッグ自動生成: 0001 形式（4桁連番）
 // ─────────────────────────────────────────────────────────────
 // 連番はpost metaに保存し、削除しても欠番にする（詰めない）
 // カウンターは wp_options の 'news_seq_counter' で管理
-//
-// 【現在の仕様】公開日変更時、スラッグの日付部分も追従して変わる
-//
-// 【公開日を固定にする場合】
-// generate_news_slug() 内の $date 取得部分を以下に差し替え:
-//   $first_date = get_post_meta( $post_id, '_news_first_publish_date', true );
-//   if ( $first_date ) {
-//       $date = $first_date;
-//   } else {
-//       $date = substr( $post_date, 0, 10 );
-//       update_post_meta( $post_id, '_news_first_publish_date', $date );
-//   }
+// URLは /news/0001 の形式
 // ─────────────────────────────────────────────────────────────
 
 /**
@@ -375,16 +364,15 @@ function assign_news_seq_number( $post_id ) {
 }
 
 /**
- * スラッグを生成: yyyy-mm-dd-0001
+ * スラッグを生成: 0001
  */
-function generate_news_slug( $post_id, $post_date ) {
-    $seq  = assign_news_seq_number( $post_id );
-    $date = substr( $post_date, 0, 10 ); // yyyy-mm-dd
-    return $date . '-' . str_pad( $seq, 4, '0', STR_PAD_LEFT );
+function generate_news_slug( $post_id ) {
+    $seq = assign_news_seq_number( $post_id );
+    return str_pad( $seq, 4, '0', STR_PAD_LEFT );
 }
 
 /**
- * 投稿保存時にスラッグを自動設定
+ * 投稿保存時にスラッグを自動設定（初回のみ、以降は手動編集可能）
  */
 function auto_set_news_slug( $data, $postarr ) {
     if ( $data['post_type'] !== 'post' ) {
@@ -399,8 +387,11 @@ function auto_set_news_slug( $data, $postarr ) {
     if ( ! $post_id ) {
         return $data;
     }
-    $post_date          = $data['post_date'];
-    $data['post_name']  = generate_news_slug( $post_id, $post_date );
+    // 連番が未割り当ての場合のみ自動設定（以降はユーザーが編集可能）
+    $seq = get_post_meta( $post_id, '_news_seq_number', true );
+    if ( ! $seq ) {
+        $data['post_name'] = generate_news_slug( $post_id );
+    }
     return $data;
 }
 add_filter( 'wp_insert_post_data', 'auto_set_news_slug', 10, 2 );
@@ -415,7 +406,7 @@ function auto_set_news_slug_on_create( $post_id, $post, $update ) {
     if ( $post->post_status === 'auto-draft' ) {
         return;
     }
-    $slug = generate_news_slug( $post_id, $post->post_date );
+    $slug = generate_news_slug( $post_id );
     if ( $post->post_name !== $slug ) {
         remove_action( 'wp_after_insert_post', 'auto_set_news_slug_on_create', 10 );
         wp_update_post( [
@@ -549,12 +540,11 @@ function news_slug_reindex_preview() {
     $preview = [];
     foreach ( $posts as $seq => $post ) {
         $seq_num  = $seq + 1;
-        $date     = substr( $post->post_date, 0, 10 );
-        $new_slug = $date . '-' . str_pad( $seq_num, 4, '0', STR_PAD_LEFT );
+        $new_slug = str_pad( $seq_num, 4, '0', STR_PAD_LEFT );
 
         $preview[] = [
             'title'        => $post->post_title,
-            'date'         => $date,
+            'date'         => substr( $post->post_date, 0, 10 ),
             'current_slug' => $post->post_name,
             'new_slug'     => $new_slug,
         ];
@@ -583,8 +573,7 @@ function news_slug_reindex_execute() {
     $count = 0;
     foreach ( $posts as $seq => $post ) {
         $seq_num  = $seq + 1;
-        $date     = substr( $post->post_date, 0, 10 );
-        $new_slug = $date . '-' . str_pad( $seq_num, 4, '0', STR_PAD_LEFT );
+        $new_slug = str_pad( $seq_num, 4, '0', STR_PAD_LEFT );
 
         update_post_meta( $post->ID, '_news_seq_number', $seq_num );
         wp_update_post( [
