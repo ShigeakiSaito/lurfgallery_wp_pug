@@ -426,6 +426,28 @@ function auto_set_news_slug( $data, $postarr ) {
 add_filter( 'wp_insert_post_data', 'auto_set_news_slug', 10, 2 );
 
 /**
+ * WordPressの重複スラッグチェックによる -2 等の付与を防止
+ * news用の連番スラッグ（0001, 0001-xxx）はそのまま通す
+ */
+function preserve_news_slug( $slug, $post_ID, $post_status, $post_type ) {
+    if ( $post_type !== 'post' ) {
+        return $slug;
+    }
+    $seq = get_post_meta( $post_ID, '_news_seq_number', true );
+    if ( ! $seq ) {
+        return $slug;
+    }
+    $prefix = str_pad( (int) $seq, 4, '0', STR_PAD_LEFT );
+    // 連番プレフィックスで始まるスラッグなら、WordPress の変更を元に戻す
+    // 例: 0001-2 → 0001, 0001-my-slug-2 → 0001-my-slug
+    if ( preg_match( '/^' . preg_quote( $prefix, '/' ) . '(-.*)?(-\d+)$/', $slug, $m ) ) {
+        return $prefix . ( $m[1] ?? '' );
+    }
+    return $slug;
+}
+add_filter( 'wp_unique_post_slug', 'preserve_news_slug', 10, 4 );
+
+/**
  * 新規投稿作成後にスラッグを設定（初回保存時はIDがないため）
  */
 function auto_set_news_slug_on_create( $post_id, $post, $update ) {
