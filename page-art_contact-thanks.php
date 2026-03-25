@@ -33,7 +33,7 @@ $ref = isset($_GET['ref']) ? esc_url($_GET['ref']) : '';
 
 				<div class="contact-thanks__action">
 					<?php if ($ref) : ?>
-					<a href="<?php echo $ref; ?>" class="contact-thanks__btn">作品ページへ戻る</a>
+					<a href="<?php echo esc_url($ref); ?>" class="contact-thanks__btn">作品ページへ戻る</a>
 					<?php else : ?>
 					<a href="<?php echo esc_url(home_url('/')); ?>" class="contact-thanks__btn">トップページへ戻る</a>
 					<?php endif; ?>

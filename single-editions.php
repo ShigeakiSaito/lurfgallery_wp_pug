@@ -50,8 +50,8 @@
 							<?php
 							$spec_fields = [
 								'year',
-								'edition',
 								'material',
+								'edition',
 								'sign',
 								'frame',
 								'size',
