@@ -90,19 +90,21 @@
 				<?php if ($overview_table['title']) : ?>
 			<p class="exhibition-detail__overview-subtitle"><?php echo esc_html($overview_table['title']); ?></p>
 				<?php endif; ?>
-			<ul class="exhibition-detail__overview-list">
 				<?php $pairs = $overview_table['rows']; ?>
-				<?php foreach ($pairs as $pair) : ?>
-					<?php if (!empty($pair['desc'])) : ?>
+				<?php if ($pairs) : ?>
+			<ul class="exhibition-detail__overview-list">
+					<?php foreach ($pairs as $pair) : ?>
+						<?php if (!empty($pair['desc'])) : ?>
 				<li class="exhibition-detail__overview-item">
 					<span class="exhibition-detail__overview-label"><?php echo esc_html($pair['term']); ?></span>
 					<span class="exhibition-detail__overview-value"><?php echo nl2br(esc_html($pair['desc'])); ?></span>
 				</li>
-					<?php endif; ?>
-				<?php endforeach; ?>
+						<?php endif; ?>
+					<?php endforeach; ?>
 			</ul>
 				<?php endif; ?>
-				<?php if ($overview_note) : ?>
+			<?php endif; ?>
+			<?php if ($overview_note) : ?>
 			<p><?php echo wp_kses_post($overview_note); ?></p>
 			<?php endif; ?>
 		</section>
