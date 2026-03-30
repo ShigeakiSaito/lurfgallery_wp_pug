@@ -613,9 +613,15 @@
 
 	// ----- Statement / Contribution View more -----
 	document.querySelectorAll('.js-statement-toggle').forEach(function(toggle) {
-		var wrapper = toggle.closest('.exhibition-detail__statement-upper') || toggle.closest('.exhibition-detail__statement').querySelector('.exhibition-detail__statement-lower') ? toggle.parentElement.previousElementSibling : null;
 		var target = toggle.parentElement.previousElementSibling;
 		if (!target) return;
+
+		// テキストがクランプされていない場合はボタンを非表示
+		var viewmoreWrap = toggle.closest('.exhibition-detail__statement-viewmore');
+		if (target.scrollHeight <= target.clientHeight) {
+			if (viewmoreWrap) viewmoreWrap.style.display = 'none';
+			return;
+		}
 
 		toggle.addEventListener('click', function() {
 			var isExtended = target.classList.toggle('is-extended');
