@@ -503,50 +503,57 @@
 				var installCurrent = document.querySelector('.js-installation-current');
 				var installNav = document.querySelector('.exhibition-detail__installation-nav');
 
+				// 1枚以下の場合はナビゲーションを非表示
 				if (slideCount <= 1) {
 					if (installNav) installNav.style.display = 'none';
 				} else {
 					if (installTotal) installTotal.textContent = slideCount;
+				}
 
-					function getInstallGap() {
-						return window.innerWidth >= 768
-							? Math.min(Math.max(window.innerWidth * 0.08, 40), 104)
-							: 16;
+				function getInstallGap() {
+					return window.innerWidth >= 768
+						? Math.min(Math.max(window.innerWidth * 0.08, 40), 104)
+						: 16;
+				}
+
+				// loopにはslidesPerViewの2倍以上のスライドが必要
+				var isPC = window.innerWidth >= 768;
+				var canLoop = slideCount > 1 && (isPC ? slideCount > 4 : slideCount > 2);
+
+				var swiperOptions = {
+					loop: canLoop,
+					speed: 600,
+					slidesPerView: 1,
+					spaceBetween: getInstallGap(),
+					breakpoints: {
+						768: {
+							slidesPerView: 2
+						}
 					}
+				};
 
-					// loopにはslidesPerViewの2倍以上のスライドが必要
-					var isPC = window.innerWidth >= 768;
-					var canLoop = isPC ? slideCount > 4 : slideCount > 2;
-
-					var installSwiper = new Swiper('#installationSwiper', {
-						loop: canLoop,
-						speed: 600,
-						slidesPerView: 1,
-						spaceBetween: getInstallGap(),
-						breakpoints: {
-							768: {
-								slidesPerView: 2
-							}
-						},
-						navigation: {
-							prevEl: '.js-installation-prev',
-							nextEl: '.js-installation-next'
-						},
-						on: {
-							slideChange: function() {
-								if (installCurrent) {
-									var index = canLoop ? this.realIndex : this.activeIndex;
-									installCurrent.textContent = index + 1;
-								}
+				// 2枚以上の場合のみナビゲーションとスライド変更イベントを有効化
+				if (slideCount > 1) {
+					swiperOptions.navigation = {
+						prevEl: '.js-installation-prev',
+						nextEl: '.js-installation-next'
+					};
+					swiperOptions.on = {
+						slideChange: function() {
+							if (installCurrent) {
+								var index = canLoop ? this.realIndex : this.activeIndex;
+								installCurrent.textContent = index + 1;
 							}
 						}
-					});
-
-					window.addEventListener('resize', function() {
-						installSwiper.params.spaceBetween = getInstallGap();
-						installSwiper.update();
-					});
+					};
 				}
+
+				var installSwiper = new Swiper('#installationSwiper', swiperOptions);
+
+				window.addEventListener('resize', function() {
+					installSwiper.params.spaceBetween = getInstallGap();
+					installSwiper.update();
+				});
 			}
 
 		});
