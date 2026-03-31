@@ -14,7 +14,7 @@ get_header();
         <?php if ( have_rows('faq') ) : ?>
           <?php while ( have_rows('faq') ) : the_row(); ?>
             <li class="faq__item">
-              <div class="faq__question js-ac-toggle">
+              <div class="faq__question js-ac-toggle is-opened">
                 <p class="faq__text">
                   <span>Q．</span>
                   <span><?php the_sub_field('question'); ?></span>
