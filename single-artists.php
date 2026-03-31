@@ -488,6 +488,12 @@ $artworks_initial_rows = 5; // PC版で表示する行数
 		const profileText = document.getElementById('js-artist-profile');
 
 		if (profileToggle && profileText) {
+			// テキストがクランプされていない場合はボタンを非表示
+			var viewmoreWrap = profileToggle.closest('.artist-detail__overview-viewmore');
+			if (profileText.scrollHeight <= profileText.clientHeight) {
+				if (viewmoreWrap) viewmoreWrap.style.display = 'none';
+			}
+
 			profileToggle.addEventListener('click', () => {
 				const isExpanded = profileText.classList.toggle('is-expanded');
 				profileToggle.classList.toggle('is-expanded', isExpanded);
