@@ -57,6 +57,12 @@
 				'field' => 'slug',
 				'terms' => $current_status,
 			);
+		} else {
+			// allの場合でも、ステータス未設定の投稿を除外
+			$tax_query[] = array(
+				'taxonomy' => 'exhibition_status',
+				'operator' => 'EXISTS',
+			);
 		}
 		if ($current_year !== 'all') {
 			$tax_query[] = array(
