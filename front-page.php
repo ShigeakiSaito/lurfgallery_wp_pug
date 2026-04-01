@@ -4,6 +4,7 @@ get_header();
 ?>
 
 <main class="top">
+    <div class="top__loading-screen" id="loading-screen"></div>
     <h1>LURF GALLERY</h1>
     <?php $mv_type = get_field('mv_type'); ?>
     <?php if ( $mv_type === 'video' ) : ?>

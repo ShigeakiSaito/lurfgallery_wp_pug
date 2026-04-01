@@ -1,4 +1,13 @@
 window.addEventListener('load', () => {
+  // 初期表示のローディングスクリーン
+  const topPageLoader = document.getElementById('loading-screen');
+  setTimeout(() => {
+    topPageLoader.classList.add('is-loaded');
+    setTimeout(() => {
+      topPageLoader.style.display = 'none';
+    }, 1000); 
+  }, 1500);
+
   // topMvSwiper
   const mvContainer = document.querySelector('.top__mv');
   const progressWrapper = document.querySelector('.mv-progressbars');
