@@ -28,26 +28,8 @@ $artworks_initial_rows = 5; // PC版で表示する行数
 			<?php if ($mv_images['sp'] ?? null) : ?>
 			<div class="artist-detail__mv-bg u-sp" style="background-image: url('<?php echo esc_url($mv_images['sp']['url'] ?? ''); ?>'); }"></div>
 			<?php endif; ?>
-			<div class="artist-detail__mv-overlay"></div>
 			<div class="artist-detail__mv-inner">
 				<h2 class="artist-detail__mv-name"><?php echo esc_html($overview['name1'] ?? ''); ?></h2>
-				<div class="artist-detail__mv-img">
-					<?php
-					$mv_pc = $mv_images['pc'] ?? null;
-					$mv_sp = $mv_images['sp'] ?? null;
-					if ($mv_pc || $mv_sp) :
-						$pc_url = $mv_pc ? esc_url($mv_pc['url']) : '';
-						$sp_url = $mv_sp ? esc_url($mv_sp['url']) : '';
-						$alt = $mv_pc ? esc_attr($mv_pc['alt']) : ($mv_sp ? esc_attr($mv_sp['alt']) : '');
-					?>
-					<picture>
-						<?php if ($sp_url) : ?>
-						<source srcset="<?php echo $sp_url; ?>" media="(max-width: 767px)">
-						<?php endif; ?>
-						<img src="<?php echo $pc_url ?: $sp_url; ?>" alt="<?php echo $alt; ?>" width="398" height="500" loading="eager">
-					</picture>
-					<?php endif; ?>
-				</div>
 			</div>
 		</section>
 
