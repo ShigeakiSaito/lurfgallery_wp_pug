@@ -15,10 +15,8 @@ get_header();
             $video_pc = get_field('mv_video_pc');
             $video_sp = get_field('mv_video_sp') ?: $video_pc;
         ?>
-        <video autoplay muted loop playsinline>
-            <source src="<?php echo esc_url( $video_pc ); ?>" media="(min-width: 768px)">
-            <source src="<?php echo esc_url( $video_sp ); ?>">
-        </video>
+        <video class="only-pc" src="<?php echo esc_url( $video_pc ); ?>" autoplay muted loop playsinline></video>
+        <video class="only-sp" src="<?php echo esc_url( $video_sp ); ?>" autoplay muted loop playsinline></video>
         <?php if ( $mv_url ) : ?></a><?php endif; ?>
     </div>
     <?php else : ?>
