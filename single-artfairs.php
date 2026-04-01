@@ -412,7 +412,7 @@
 
 		<!-- ===== Section 13: INSTALLATION VIEWS ===== -->
 		<?php $installation_views = get_field('installation_views'); ?>
-		<?php if ($installation_views) : ?>
+		<?php if ($installation_views && is_array($installation_views) && count($installation_views) > 0) : ?>
 		<section class="exhibition-detail__installation">
 			<h3 class="exhibition-detail__section-heading">Installation Views</h3>
 			<div class="exhibition-detail__installation-nav">
