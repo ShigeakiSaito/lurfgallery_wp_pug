@@ -344,7 +344,7 @@
 		<?php $events = get_field('events'); ?>
 		<?php $events_table = get_field('events_table'); ?>
 		<?php $events_note = get_field('events_note'); ?>
-		<?php if ($events) : ?>
+		<?php if ($events || $events_table || $events_note) : ?>
 		<section class="exhibition-detail__events">
 			<h3 class="exhibition-detail__section-heading">Events</h3>
 			<div class="exhibition-detail__events-body wysiwyg">
@@ -355,8 +355,9 @@
 				<?php if (!empty($events_table['title'])) : ?>
 				<p class="exhibition-detail__event-subtitle"><?php echo esc_html($events_table['title']); ?></p>
 				<?php endif; ?>
+				<?php	$pairs = $events_table['rows'];	?>
+				<?php if ($pairs) : ?>
 				<ul class="exhibition-detail__event-list">
-					<?php	$pairs = $events_table['rows'];	?>
 					<?php foreach ($pairs as $pair) : ?>
 						<?php if (!empty($pair['desc'])) : ?>
 					<li class="exhibition-detail__event-item">
@@ -366,6 +367,7 @@
 						<?php endif; ?>
 					<?php endforeach; ?>
 				</ul>
+				<?php endif; ?>
 			</div>
 			<?php endif; ?>
 			<?php if ($events_note) : ?>

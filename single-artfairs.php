@@ -355,8 +355,9 @@
 				<?php if (!empty($events_table['title'])) : ?>
 				<p class="exhibition-detail__event-subtitle"><?php echo esc_html($events_table['title']); ?></p>
 				<?php endif; ?>
+				<?php	$pairs = $events_table['rows'];	?>
+				<?php if ($pairs) : ?>
 				<ul class="exhibition-detail__event-list">
-					<?php	$pairs = $events_table['rows'];	?>
 					<?php foreach ($pairs as $pair) : ?>
 						<?php if (!empty($pair['desc'])) : ?>
 					<li class="exhibition-detail__event-item">
@@ -366,6 +367,7 @@
 						<?php endif; ?>
 					<?php endforeach; ?>
 				</ul>
+				<?php endif; ?>
 			</div>
 			<?php endif; ?>
 			<?php if ($events_note) : ?>
