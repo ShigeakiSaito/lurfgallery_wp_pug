@@ -199,6 +199,7 @@ function create_post_type() {
 			// 'has_archive' => true,
 			'menu_position' => 6,
 			'supports' => array('title', 'custom-fields'),
+			'rewrite' => array('slug' => 'works'),
 		)
 	);
 	// editions
