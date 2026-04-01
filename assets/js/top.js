@@ -6,7 +6,7 @@ window.addEventListener('load', () => {
     setTimeout(() => {
       topPageLoader.style.display = 'none';
     }, 1000); 
-  }, 1500);
+  }, 3800);
 
   // topMvSwiper
   const mvContainer = document.querySelector('.top__mv');
