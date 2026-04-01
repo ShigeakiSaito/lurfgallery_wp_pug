@@ -355,8 +355,9 @@
 				<?php if (!empty($events_table['title'])) : ?>
 				<p class="exhibition-detail__event-subtitle"><?php echo esc_html($events_table['title']); ?></p>
 				<?php endif; ?>
+				<?php	$pairs = $events_table['rows'];	?>
+				<?php if ($pairs) : ?>
 				<ul class="exhibition-detail__event-list">
-					<?php	$pairs = $events_table['rows'];	?>
 					<?php foreach ($pairs as $pair) : ?>
 						<?php if (!empty($pair['desc'])) : ?>
 					<li class="exhibition-detail__event-item">
@@ -366,6 +367,7 @@
 						<?php endif; ?>
 					<?php endforeach; ?>
 				</ul>
+				<?php endif; ?>
 			</div>
 			<?php endif; ?>
 			<?php if ($events_note) : ?>
@@ -412,7 +414,7 @@
 
 		<!-- ===== Section 13: INSTALLATION VIEWS ===== -->
 		<?php $installation_views = get_field('installation_views'); ?>
-		<?php if ($installation_views) : ?>
+		<?php if ($installation_views && is_array($installation_views) && count($installation_views) > 0) : ?>
 		<section class="exhibition-detail__installation">
 			<h3 class="exhibition-detail__section-heading">Installation Views</h3>
 			<div class="exhibition-detail__installation-nav">
@@ -594,9 +596,7 @@
 				const hiddenItems = row.querySelectorAll('.exhibition-detail__work.is-hidden');
 				if (hiddenItems.length === 0) return;
 
-				const showCount = Math.min(colCount, hiddenItems.length);
-
-				for (let i = 0; i < showCount; i++) {
+				for (let i = 0; i < hiddenItems.length; i++) {
 					const item = hiddenItems[i];
 					item.classList.remove('is-hidden');
 					item.classList.add('is-appearing');
