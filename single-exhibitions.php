@@ -597,9 +597,7 @@
 				const hiddenItems = row.querySelectorAll('.exhibition-detail__work.is-hidden');
 				if (hiddenItems.length === 0) return;
 
-				const showCount = Math.min(colCount, hiddenItems.length);
-
-				for (let i = 0; i < showCount; i++) {
+				for (let i = 0; i < hiddenItems.length; i++) {
 					const item = hiddenItems[i];
 					item.classList.remove('is-hidden');
 					item.classList.add('is-appearing');
