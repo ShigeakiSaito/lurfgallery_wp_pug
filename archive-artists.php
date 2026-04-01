@@ -131,10 +131,10 @@ function get_artist_index_image($post_id) {
 
 		<!-- ===== グリッド表示 ===== -->
 		<div class="artists-index__view artists-index__view--grid is-active">
-			<!-- FEATURED WORKS -->
+			<!-- ARTISTS -->
 			<?php if (!empty($artists_flat)) : ?>
 			<section class="artists-index__section artists-index__section--featured">
-				<h2 class="artists-index__heading">FEATURED WORKS</h2>
+				<h2 class="artists-index__heading">ARTISTS</h2>
 				<div class="artists-index__grid artists-index__grid--featured">
 					<?php foreach ($artists_flat as $artist_post) :
 						$a_id = $artist_post->ID;
