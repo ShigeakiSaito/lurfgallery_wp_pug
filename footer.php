@@ -8,7 +8,7 @@
         <div class="footer__links">
             <ul class="list">
                 <!-- <li><a href="">ABOUT</a></li> -->
-                <li><a href="https://shop.lurfgallery.com/pages/contact" target="_blank">CONTACT</a></li>
+                <li><a href="<?php echo esc_url( home_url( '/contact' ) ); ?>">CONTACT</a></li>
                 <li><a href="https://shop.lurfgallery.com" target="_blank">SHOP</a></li>
                 <li><a href="<?php echo esc_url( home_url( '/information' ) ); ?>">INFORMATION</a></li>
             </ul>
