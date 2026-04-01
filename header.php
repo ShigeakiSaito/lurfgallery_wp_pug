@@ -62,10 +62,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <form action="<?php echo esc_url(home_url('/')); ?>" method="get" class="header__search">
                 <label><input type="text" name="s" value="<?php echo esc_attr(get_search_query()); ?>" placeholder="SEARCH"></label>
             </form>
+            <?php $is_jp = (strpos($_SERVER['REQUEST_URI'], '/en/') === false); ?>
             <div class="header__language">
-                <a href="<?php echo esc_url(home_url('/')); ?>" class="jp">JP</a>
+                <a href="<?php echo esc_url(home_url('/')); ?>" class="<?php echo $is_jp ? 'jp' : 'en'; ?>">JP</a>
                 <span>/</span>
-                <a href="<?php echo esc_url(home_url('/en/')); ?>" class="en">EN</a>
+                <a href="<?php echo esc_url(home_url('/en/')); ?>" class="<?php echo $is_jp ? 'en' : 'jp'; ?>">EN</a>
             </div>
         </nav>
     </div>
